@@ -24,12 +24,14 @@ const Theme = sequelize.define("theme", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 	title: { type: DataTypes.STRING },
 	description: { type: DataTypes.STRING },
+	paragraphId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Paragraph
 	img: { type: DataTypes.STRING },
 });
 
 const Test = sequelize.define("test", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	title: { type: DataTypes.STRING, unique: true },
+	title: { type: DataTypes.STRING,},
+	choseAnswer: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false },
 	themeId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Theme
 });
 
@@ -41,7 +43,7 @@ const Question = sequelize.define("question", {
 const Answer = sequelize.define("answer", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 	text: { type: DataTypes.STRING },
-	isCorrect: { type: DataTypes.BOOLEAN, defaultValue: false },
+	isCorrect: { type: DataTypes.BOOLEAN, defaultValue: true },
 	testId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Test
 });
 
@@ -59,14 +61,14 @@ const FinalResult = sequelize.define("finalResult", {
 	result: { type: DataTypes.STRING }, // Example: "3/5" for 3 out of 5 correct answers
 });
 
-// Define associations
+// Каждый курс имеет параграфы
 Course.hasMany(Paragraph);
 Paragraph.belongsTo(Course);
 
 Theme.hasMany(Test);
 Test.belongsTo(Theme);
 
-Test.hasMany(Answer);
+Test.hasOne(Answer);
 Answer.belongsTo(Test);
 
 User.hasMany(Rating);
@@ -76,6 +78,22 @@ Course.hasMany(FinalResult);
 FinalResult.belongsTo(Course);
 User.hasMany(FinalResult);
 FinalResult.belongsTo(User);
+
+// Каждый параграф имеет темы
+Paragraph.hasMany(Theme);
+Theme.belongsTo(Paragraph);
+
+// Каждый параграф также имеет тесты
+Paragraph.hasMany(Test);
+Test.belongsTo(Paragraph);
+
+// Каждый тест имеет вопросы
+Test.hasMany(Question);
+Question.belongsTo(Test);
+
+// Каждый тест также имеет ответы
+Test.hasMany(Answer);
+Answer.belongsTo(Test);
 
 module.exports = {
 	User,

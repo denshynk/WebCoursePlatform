@@ -10,6 +10,7 @@ const testRouter = require("./testRouter");
 const themRouter = require("./themRouter");
 const userRouter = require("./userRouter");
 
+
 router.use('/user', userRouter)
 router.use('/answer', answerRouter)
 router.use('/cours',coursRouter)
@@ -18,7 +19,7 @@ router.use('/paragraph',paragraphRouter)
 router.use('/question',questionRouter)
 router.use("/rating", ratingRouter);
 router.use('/test',testRouter)
-router.use('/them',themRouter)
+router.use('/theme',themRouter)
 
 
 
