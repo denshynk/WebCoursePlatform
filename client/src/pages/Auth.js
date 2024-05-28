@@ -37,7 +37,7 @@ const Auth = observer(() => {
 				data = await login(email, password);
 				user.setUser(user);
 				user.setIsAuth(true);
-				navigate(ALL_COURSES_ROUTE);
+				
 			} else {
 				data = await registration(
 					email,
@@ -48,6 +48,7 @@ const Auth = observer(() => {
 				);
 				setIsRegistrationRequested(true);
 			}
+			navigate(ALL_COURSES_ROUTE);
 		} catch (e) {
 			alert(e.response.data.message);
 		}

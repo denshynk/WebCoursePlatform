@@ -2,18 +2,25 @@ const jwt = require("jsonwebtoken");
 
 module.exports = function (req, res, next) {
 	if (req.method === "OPTIONS") {
-		next();
+		return next();
 	}
 
 	try {
-		const token = req.headers.authorization.split(" ")[1];
+		const authHeader = req.headers.authorization;
+		if (!authHeader) {
+			// Пропускаем проверку, если заголовок авторизации отсутствует
+			return next();
+		}
+
+		const token = authHeader.split(" ")[1];
 		if (!token) {
 			return res.status(401).json({ message: "Не авторизован" });
-        }
-        const decoder = jwt.verify(token, process.env.SECRET_KEY_JWT);
-        req.user = decoder
-        next()
+		}
+
+		const decoder = jwt.verify(token, process.env.SECRET_KEY_JWT);
+		req.user = decoder;
+		next();
 	} catch (e) {
-		res.status(401).json({ message: "Не авторизован" });
+		return res.status(401).json({ message: "Ошибка" });
 	}
 };
