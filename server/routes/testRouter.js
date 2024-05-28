@@ -3,7 +3,7 @@ const router = new Router();
 const testController = require("../controllers/testControllers");
 
 router.post("/", testController.create);
-router.get("/", testController.get);
-router.get("/", testController.getOne);
+router.get("/", testController.getAll);
+// router.get("/", testController.getOne);
 
 module.exports = router;

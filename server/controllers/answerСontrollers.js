@@ -5,19 +5,26 @@ class AnswerController {
 	async create(req, res, next) {
 		try {
 			const { text, testId } = req.body;
-			const answer = await Answer.create({ text,  testId });
+			const answer = await Answer.create({ text, testId });
 			return res.json(answer);
 		} catch (e) {
 			next(ApiError.badRequest(e.message));
 		}
 	}
 	async getAll(req, res) {
-		const answers = await Answer.findAll();
+		const { testId } = req.body;
+		let answers;
+		if (testId) {
+			answers = await Answer.findAll({ where: { testId } });
+		}
+		else {
+			answers = await Answer.findAll()
+		}
 		return res.json(answers);
 	}
 	async getOne(req, res) {
-		const {id} = req.body
-		const answer = await Answer.findOne({ id });
+		const { testId } = req.body;
+		const answer = await Answer.findOne({ where: { testId } });
 		return res.json(answer);
 	}
 }
