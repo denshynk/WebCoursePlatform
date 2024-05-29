@@ -9,7 +9,7 @@ import {
 } from "../utils/consts";
 import { login, registration } from "../http/userApi";
 import { observer } from "mobx-react-lite";
-import { Context } from "..";
+import { Context } from "../index";
 
 const Auth = observer(() => {
 	const { user } = useContext(Context);
@@ -35,9 +35,9 @@ const Auth = observer(() => {
 			let data;
 			if (isLogin) {
 				data = await login(email, password);
-				user.setUser(user);
+				user.setUser(data.userData);
 				user.setIsAuth(true);
-				
+				navigate(ALL_COURSES_ROUTE);
 			} else {
 				data = await registration(
 					email,
@@ -48,7 +48,6 @@ const Auth = observer(() => {
 				);
 				setIsRegistrationRequested(true);
 			}
-			navigate(ALL_COURSES_ROUTE);
 		} catch (e) {
 			alert(e.response.data.message);
 		}

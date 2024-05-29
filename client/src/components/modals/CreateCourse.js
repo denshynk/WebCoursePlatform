@@ -1,8 +1,24 @@
-import React from 'react'
-import { Button, Form, Modal } from 'react-bootstrap';
+import React, { useState } from "react";
+import { Button, Form, Modal } from "react-bootstrap";
+import { createCourse } from "../../http/courseApi"; // Make sure the path is correct
 
-const CreateCourse = ({show, onHide}) => {
-  return (
+const CreateCourse = ({ show, onHide }) => {
+	const [courseName, setCourseName] = useState("");
+
+	const handleCreateCourse = async () => {
+		try {
+			const course = { title: courseName };
+			const data = await createCourse(course);
+			console.log("Course created successfully:", data);
+			// You can add more logic here if needed, such as showing a success message or clearing the form
+			onHide();
+		} catch (error) {
+			console.error("Error creating course:", error);
+			// Handle error appropriately, e.g., show an error message to the user
+		}
+	};
+
+	return (
 		<Modal
 			show={show}
 			onHide={onHide}
@@ -17,16 +33,23 @@ const CreateCourse = ({show, onHide}) => {
 			</Modal.Header>
 			<Modal.Body>
 				<Form>
-					<Form.Control placeholder={"Назва курсу"} />
+					<Form.Control
+						placeholder={"Назва курсу"}
+						value={courseName}
+						onChange={(e) => setCourseName(e.target.value)}
+					/>
 				</Form>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant='outline-danger' onClick={onHide}>Закрити</Button>
-				<Button variant='outline-success' onClick={onHide}>Додати</Button>
+				<Button variant="outline-danger" onClick={onHide}>
+					Закрити
+				</Button>
+				<Button variant="outline-success" onClick={handleCreateCourse}>
+					Додати
+				</Button>
 			</Modal.Footer>
 		</Modal>
 	);
-  
-}
+};
 
-export default CreateCourse
+export default CreateCourse;

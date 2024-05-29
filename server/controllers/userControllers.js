@@ -75,7 +75,14 @@ class UserController {
 			return next(ApiError.internal("Указан неверный пароль"));
 		}
 		const token = generateJWT(user.id, user.email, user.role);
-		return res.json({ token });
+			const dataUser = {
+				email: user.email,
+				name: user.name,
+				surname: user.surname,
+				group: user.group,
+				role: user.role,
+			};
+		return res.json({ token, dataUser });
 	}
 
 	async check(req, res, next) {

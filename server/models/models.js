@@ -14,28 +14,41 @@ const User = sequelize.define("user", {
 
 const Course = sequelize.define("course", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	title: { type: DataTypes.STRING, unique: true },
+	title: { type: DataTypes.STRING, unique: true, allowNull: false },
 });
 
 const Paragraph = sequelize.define("paragraph", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	title: { type: DataTypes.STRING, unique: true },
+	title: { type: DataTypes.STRING, unique: false },
+	text: { type: DataTypes.TEXT, unique: false },
 	courseId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Course
 });
 
 const Theme = sequelize.define("theme", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 	title: { type: DataTypes.STRING },
-	description: { type: DataTypes.STRING },
+	description: { type: DataTypes.TEXT },
 	paragraphId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Paragraph
 	img: { type: DataTypes.STRING },
+});
+
+const ThemText = sequelize.define("them_text", {
+	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+	number: { type: DataTypes.INTEGER, allowNull: false },
+	title: { type: DataTypes.STRING, allowNull: true },
+	text: { type: DataTypes.TEXT, allowNull: false },
 });
 
 const Test = sequelize.define("test", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 	title: { type: DataTypes.STRING },
-	choseAnswer: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false },
 	themeId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Theme
+});
+
+const Question = sequelize.define("questions", {
+	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+	title: { type: DataTypes.STRING },
+	choseAnswer: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false },
 });
 
 const TestCategory = sequelize.define("test_category", {
@@ -47,7 +60,6 @@ const Answer = sequelize.define("answer", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 	text: { type: DataTypes.STRING },
 	isCorrect: { type: DataTypes.BOOLEAN, defaultValue: true },
-	testId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Test
 });
 
 const FinalResult = sequelize.define("finalResult", {
@@ -105,8 +117,8 @@ Test.belongsTo(TestCategory);
 Test.hasMany(UserAnswer);
 UserAnswer.belongsTo(Test);
 
-Test.hasMany(Answer);
-Answer.belongsTo(Test);
+Question.hasOne(Answer);
+Answer.belongsTo(Question);
 
 Course.hasMany(FinalResult);
 FinalResult.belongsTo(Course);
@@ -116,6 +128,12 @@ FinalResult.belongsTo(User);
 
 User.hasMany(UserAnswer);
 UserAnswer.belongsTo(User);
+
+Test.hasMany(Question);
+Question.belongsTo(Test);
+
+Theme.hasMany(ThemText);
+ThemText.belongsTo(Theme);
 
 module.exports = {
 	User,
@@ -127,4 +145,8 @@ module.exports = {
 	FinalResult,
 	PreRegistration,
 	UserAnswer,
+	UserCourse,
+	ThemText,
+	TestCategory,
+	Question
 };

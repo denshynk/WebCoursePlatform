@@ -1,4 +1,4 @@
-const { Course, Paragraph, Theme, Test } = require("../models/models");
+const { Course, Paragraph, Theme, Test, ThemText} = require("../models/models");
 const ApiError = require("../error/ApiError");
 
 class CoursController {
@@ -15,18 +15,31 @@ class CoursController {
 		const { id } = req.params;
 		const course = await Course.findOne({
 			where: { id },
+			attributes: { exclude: ["createdAt", "updatedAt"] },
 			include: [
 				{
 					model: Paragraph,
+					attributes: { exclude: ["createdAt", "updatedAt"] },
 					include: [
 						{
 							model: Theme,
-							include: [Test],
+							attributes: { exclude: ["createdAt", "updatedAt"] },
+							include: [
+								{
+									model: Test,
+									attributes: { exclude: ["createdAt", "updatedAt"] },
+								},
+								{
+									model: ThemText, // Включаем модель ThemText
+									attributes: { exclude: ["createdAt", "updatedAt"] },
+								},
+							],
 						},
 					],
 				},
 			],
 		});
+
 		if (!course) {
 			return res.status(404).json({ message: "Course not found" });
 		}

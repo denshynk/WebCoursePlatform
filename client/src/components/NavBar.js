@@ -5,6 +5,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { NavLink } from "react-router-dom";
 import {
+	ACOUNT_ROUTE,
 	ADMIN_ROUTE,
 	BASKET_COURSE_ROUTE,
 	LOGIN_ROUTE,
@@ -27,7 +28,7 @@ const NavBar = observer(() => {
 			<Container>
 				<NavLink
 					style={{ color: "white", textDecoration: "none" }}
-					to={BASKET_COURSE_ROUTE}
+					to={ACOUNT_ROUTE}
 				>
 					KPI Web-Course
 				</NavLink>

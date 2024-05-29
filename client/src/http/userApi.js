@@ -34,7 +34,11 @@ export const login = async (email, password) => {
 		password,
 	});
 	localStorage.setItem("token", data.token);
-	return jwtDecode(data.token);
+	return {
+		token: data.token,
+		userData: data.dataUser,
+		courses: data.courses,
+	};
 };
 
 export const check = async () => {

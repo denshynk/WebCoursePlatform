@@ -6,3 +6,4 @@ export const BASKET_COURSE_ROUTE = "/mycourses";
 export const COURSE_ROUTE = "/course";
 
 
+export const ACOUNT_ROUTE = "/myacount";

@@ -9,6 +9,7 @@ const themRouter = require("./themRouter");
 const userRouter = require("./userRouter");
 const preRegistration = require('./preRegistrationRouter')
 const userAnswer = require('./userAnswerRouter')
+const testcategory = require('./testCategoryRouter')
 
 
 
@@ -21,6 +22,7 @@ router.use("/test", testRouter);
 router.use("/userAnswer", userAnswer);
 router.use('/answer', answerRouter)
 router.use('/finalResult', finalResultRouter)
+router.use("/testcategory", testcategory);
 
 
 

@@ -1,8 +1,10 @@
-import React from 'react'
-import { Button, Form, Modal } from 'react-bootstrap';
+import React, { useState } from "react";
+import { Button, Form, Modal } from "react-bootstrap";
 
-const AddCourseToStudent = ({show, onHide}) => {
-  return (
+const AddCourseToStudent = ({ show, onHide }) => {
+	const [nameCourse, setNameCourse] = useState("");
+
+	return (
 		<Modal
 			show={show}
 			onHide={onHide}
@@ -30,6 +32,6 @@ const AddCourseToStudent = ({show, onHide}) => {
 			</Modal.Footer>
 		</Modal>
 	);
-}
+};
 
-export default AddCourseToStudent
+export default AddCourseToStudent;

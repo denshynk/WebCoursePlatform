@@ -23,7 +23,14 @@ const App = observer(() => {
 	}, []);
 
 	if (loading) {
-		return <Spinner animation={"grow"} />;
+		return (
+			<Spinner
+				className="d-flex justify-contenc-center align-items-center "
+				animation="border"
+				role="status"
+				
+			/>
+		);
 	}
 
 	return (

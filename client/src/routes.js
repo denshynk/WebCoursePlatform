@@ -1,6 +1,7 @@
 // routes.js
 import Admin from "./pages/Admin";
 import {
+	ACOUNT_ROUTE,
 	ADMIN_ROUTE,
 	ALL_COURSES_ROUTE,
 	BASKET_COURSE_ROUTE,
@@ -12,11 +13,17 @@ import Course from "./pages/Course";
 import AllCourse from "./pages/AllCourse";
 import MyCourses from "./pages/MyCourses";
 import Auth from "./pages/Auth.js";
+import Account from "./pages/Acount.js";
 
 export const authRoutes = [
 	{
 		path: ADMIN_ROUTE,
 		element: <Admin />,
+	},
+
+	{
+		path: ACOUNT_ROUTE,
+		element: <Account />,
 	},
 	{
 		path: COURSE_ROUTE + "/:id",

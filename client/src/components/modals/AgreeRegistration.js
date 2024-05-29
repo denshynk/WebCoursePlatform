@@ -153,10 +153,10 @@ const CrateThem = ({ show, onHide }) => {
 				</Table>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-danger" onClick={handleDelete}>
+				<Button variant="outline-danger" onClick={() =>{ handleDelete(); onHide()}}>
 					Удалить
 				</Button>
-				<Button variant="outline-success" onClick={handleAdd}>
+				<Button variant="outline-success" onClick={() => {handleAdd(); onHide()}}>
 					Добавить
 				</Button>
 			</Modal.Footer>

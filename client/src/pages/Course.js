@@ -4,9 +4,7 @@ import { useParams } from "react-router-dom";
 import { fetchOneCourse } from "../http/courseApi";
 
 const Course = () => {
-	const [course, setCourse] = useState({
-		
-	});
+	const [course, setCourse] = useState({});
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -17,7 +15,7 @@ const Course = () => {
 				// Optionally set course to null or empty object if the fetch fails
 				setCourse(null);
 			});
-console.log(course);
+		console.log(course);
 	}, [id]);
 
 	const [selectedTheme, setSelectedTheme] = useState(null);
@@ -26,6 +24,7 @@ console.log(course);
 	const [testAnswers, setTestAnswers] = useState({});
 	const [timeLeft, setTimeLeft] = useState(300);
 	const [testCompleted, setTestCompleted] = useState(false);
+
 
 	useEffect(() => {
 		let timer;
@@ -60,6 +59,7 @@ console.log(course);
 		setCurrentQuestion(0);
 		setTestCompleted(false);
 		setTestAnswers({});
+		setSelectedParagraph(null);
 	};
 
 	const handleStartTest = () => {
@@ -78,6 +78,13 @@ console.log(course);
 		}));
 	};
 
+	const [selectedParagraph, setSelectedParagraph] = useState(null);
+
+	const handleParagraphClick = (paragraphId) => {
+		setSelectedParagraph(paragraphId);
+		setSelectedTheme(null);
+	};
+
 	const handleSubmitTest = () => {
 		setShowTest(false);
 		setTestCompleted(true);
@@ -87,9 +94,6 @@ console.log(course);
 		console.log(completeAnswers);
 	};
 
-	
-	
-
 	return (
 		<Container className="mt-3">
 			<h1>{course?.title}</h1>
@@ -98,7 +102,13 @@ console.log(course);
 					<h2>Материал курса</h2>
 					{course?.paragraphs?.map((par) => (
 						<div key={par.id}>
-							<h5 className="mt-3">{par.title}</h5>
+							<h5
+								className="mt-3"
+								style={{ cursor: "pointer" }}
+								onClick={() => handleParagraphClick(par.id)}
+							>
+								{par.title}
+							</h5>
 							<ul>
 								{par?.themes?.map((t) => (
 									<li key={t.id}>
@@ -116,6 +126,22 @@ console.log(course);
 					))}
 				</Col>
 				<Col md={8}>
+					{selectedParagraph && (
+						<div>
+							<h1>
+								{
+									course?.paragraphs.find((par) => par.id === selectedParagraph)
+										?.title
+								}
+							</h1>
+							<p>
+								{
+									course?.paragraphs.find((par) => par.id === selectedParagraph)
+										?.text
+								}
+							</p>
+						</div>
+					)}
 					{selectedTheme && !showTest && !testCompleted && (
 						<div>
 							<h1>{selectedTheme.title}</h1>
@@ -128,9 +154,33 @@ console.log(course);
 										<p>{txt.maintext}</p>
 									</div>
 								))}
-							<Button variant="primary" onClick={handleStartTest}>
-								Пройти тест
-							</Button>
+							{/* Дополнительные тексты */}
+							{selectedTheme?.them_texts?.map((them_texts) => (
+								<div key={them_texts.id}>
+									<h2>{them_texts.title}</h2>
+									<p>{them_texts.text}</p>
+								</div>
+							))}
+							{selectedTheme &&
+								selectedTheme.test &&
+								!showTest &&
+								!testCompleted && (
+									<div>
+										<h1>{selectedTheme.title}</h1>
+										<p>{selectedTheme.description}</p>
+										{selectedTheme?.text
+											?.sort((a, b) => a.number - b.number)
+											?.map((txt) => (
+												<div key={txt.id}>
+													<h2>{txt.title}</h2>
+													<p>{txt.maintext}</p>
+												</div>
+											))}
+										<Button variant="primary" onClick={handleStartTest}>
+											Пройти тест
+										</Button>
+									</div>
+								)}
 						</div>
 					)}
 					{showTest && currentQuestion < (selectedTheme?.test || []).length && (
