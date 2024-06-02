@@ -75,19 +75,28 @@ class UserController {
 			return next(ApiError.internal("Указан неверный пароль"));
 		}
 		const token = generateJWT(user.id, user.email, user.role);
-			const dataUser = {
-				email: user.email,
-				name: user.name,
-				surname: user.surname,
-				group: user.group,
-				role: user.role,
-			};
+		const dataUser = {
+			email: user.email,
+			name: user.name,
+			surname: user.surname,
+			group: user.group,
+			role: user.role,
+		};
 		return res.json({ token, dataUser });
 	}
 
 	async check(req, res, next) {
 		const token = generateJWT(req.user.id, req.user.email, req.user.role);
-		return res.json({ token });
+		const email = req.user.email 
+		const user = await User.findOne({ where: { email } });
+		const dataUser = {
+			email: user.email,
+			name: user.name,
+			surname: user.surname,
+			group: user.group,
+			role: user.role,
+		};
+		return res.json({ token, dataUser });
 	}
 }
 

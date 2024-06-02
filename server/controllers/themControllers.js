@@ -12,7 +12,6 @@ class ThemeController {
 			});
 
 			if (texts && texts.length > 0) {
-				// Создание текстов для темы
 				const createdTexts = await Promise.all(
 					texts.map(async (textItem) => {
 						const createdText = await ThemText.create({
@@ -57,11 +56,15 @@ class ThemeController {
 	async getParagraphThem(req, res) {
 		try {
 			const { paragraphId } = req.params;
-			const theme = await Theme.findAll({
+			const themes = await Theme.findAll({
 				where: { paragraphId },
 				attributes: { exclude: ["createdAt", "updatedAt"] },
+				include: {
+					model: ThemText,
+					attributes: { exclude: ["createdAt", "updatedAt"] },
+				}, // Включаем модель ThemText для каждой темы
 			});
-			return res.json(theme);
+			return res.json(themes);
 		} catch (e) {
 			next(ApiError.badRequest(e.message));
 		}

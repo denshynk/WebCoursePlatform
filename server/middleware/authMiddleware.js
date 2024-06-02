@@ -7,20 +7,17 @@ module.exports = function (req, res, next) {
 
 	try {
 		const authHeader = req.headers.authorization;
-		if (!authHeader) {
-			// Пропускаем проверку, если заголовок авторизации отсутствует
-			return next();
+		const token = authHeader.split(" ")[1]; // Bearer
+		// Проверка на наличие токена после разбиения строки
+		if (token === "null") {
+			// return res.status(401).json({ message: "Не авторизован" });
 		}
+		const decoded = jwt.verify(token, process.env.SECRET_KEY_JWT);
+		req.user = decoded;
 
-		const token = authHeader.split(" ")[1];
-		if (!token) {
-			return res.status(401).json({ message: "Не авторизован" });
-		}
-
-		const decoder = jwt.verify(token, process.env.SECRET_KEY_JWT);
-		req.user = decoder;
 		next();
 	} catch (e) {
-		return res.status(401).json({ message: "Ошибка" });
+		console.error("Ошибка при проверке токена:", e); // Логирование ошибки для отладки
+		return res.status(401).json({ message: "Ошибка при проверке токена" });
 	}
 };

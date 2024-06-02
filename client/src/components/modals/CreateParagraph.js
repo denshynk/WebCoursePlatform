@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
-import { createParagraph, fetchCourse } from "../../http/courseApi"; // Make sure the path is correct
+import { Button, Form, Modal, ListGroup } from "react-bootstrap";
+import {
+	fetchCourse,
+	fetchParagraph,
+	updateParagraph,
+	deleteParagraph,
+	createParagraph,
+} from "../../http/courseApi"; // Убедитесь, что путь правильный
 
 const CreateParagraph = ({ show, onHide }) => {
 	const [paragraphName, setParagraphName] = useState("");
 	const [paragraphText, setParagraphText] = useState("");
 	const [courses, setCourses] = useState([]);
+	const [paragraphs, setParagraphs] = useState([]);
 	const [selectedCourseId, setSelectedCourseId] = useState("");
+	const [editingParagraph, setEditingParagraph] = useState(null);
+	const [editingName, setEditingName] = useState("");
+	const [editingText, setEditingText] = useState("");
 
 	useEffect(() => {
 		const fetchCourses = async () => {
@@ -16,12 +26,30 @@ const CreateParagraph = ({ show, onHide }) => {
 			} catch (error) {
 				console.error("Error fetching courses:", error);
 			}
+
 		};
 
 		if (show) {
 			fetchCourses();
 		}
-	}, [show]);
+	}, [show,]);
+
+	useEffect(() => {
+		const fetchParagraphsForCourse = async () => {
+			try {
+				if (selectedCourseId) {
+					const data = await fetchParagraph(selectedCourseId);
+					setParagraphs(data);
+				} else {
+					setParagraphs([]);
+				}
+			} catch (error) {
+				console.error("Error fetching paragraphs:", error);
+			}
+		};
+
+		fetchParagraphsForCourse();
+	}, [selectedCourseId]);
 
 	const handleCreateParagraph = async () => {
 		try {
@@ -32,9 +60,41 @@ const CreateParagraph = ({ show, onHide }) => {
 			};
 			const data = await createParagraph(paragraph);
 			console.log("Paragraph created successfully:", data);
-			onHide();
+			setParagraphName("");
+			setParagraphText("");
+			setParagraphs([...paragraphs, data]);
 		} catch (error) {
 			console.error("Error creating paragraph:", error);
+		}
+	};
+
+	const handleUpdateParagraph = async () => {
+		try {
+			const updatedParagraph = {
+				...editingParagraph,
+				title: editingName,
+				text: editingText,
+			};
+
+			await updateParagraph(updatedParagraph);
+			const data = await fetchParagraph(selectedCourseId);
+			setParagraphs(data);
+			setEditingParagraph(null);
+			setEditingName("");
+			setEditingText("");
+		} catch (error) {
+			console.error("Error updating paragraph:", error);
+		}
+	};
+
+	const handleDeleteParagraph = async (id) => {
+		try {
+			console.log(id);
+			await deleteParagraph(id);
+
+			setParagraphs(paragraphs.filter((paragraph) => paragraph.id !== id));
+		} catch (error) {
+			console.error("Error deleting paragraph:", error);
 		}
 	};
 
@@ -89,14 +149,78 @@ const CreateParagraph = ({ show, onHide }) => {
 							{paragraphText.length}/10000
 						</div>
 					</Form.Group>
+					<Form.Group className="d-flex justify-content-end">
+						<Button variant="outline-success" onClick={handleCreateParagraph}>
+							Додати
+						</Button>
+					</Form.Group>
 				</Form>
+				{selectedCourseId && (
+					<div className="mt-4">
+						<h5>Існуючі параграфи</h5>
+						{paragraphs
+							.sort((a, b) => a.id - b.id)
+							.map((paragraph) => (
+								<ListGroup key={paragraph.id}>
+									<ListGroup.Item variant="primary">
+										{editingParagraph === paragraph ? (
+											<Form.Control
+												type="text"
+												value={editingName}
+												onChange={(e) => setEditingName(e.target.value)}
+											/>
+										) : (
+											paragraph.title
+										)}
+									</ListGroup.Item>
+									<ListGroup.Item variant="secondary">
+										{editingParagraph === paragraph ? (
+											<Form.Control
+												as="textarea"
+												rows={5}
+												value={editingText}
+												onChange={(e) => setEditingText(e.target.value)}
+												maxLength={10000}
+											/>
+										) : (
+											paragraph.text
+										)}
+									</ListGroup.Item>
+									{editingParagraph === paragraph ? (
+										<Button
+											variant="outline-success"
+											onClick={handleUpdateParagraph}
+										>
+											Зберегти
+										</Button>
+									) : (
+										<Button
+											className="mt-2"
+											variant="outline-primary"
+											onClick={() => {
+												setEditingParagraph(paragraph);
+												setEditingName(paragraph.title);
+												setEditingText(paragraph.text);
+											}}
+										>
+											Редагувати
+										</Button>
+									)}
+									<Button
+										variant="outline-danger"
+										onClick={() => handleDeleteParagraph(paragraph.id)}
+										className="mt-2 mb-4"
+									>
+										Видалити
+									</Button>
+								</ListGroup>
+							))}
+					</div>
+				)}
 			</Modal.Body>
 			<Modal.Footer>
 				<Button variant="outline-danger" onClick={onHide}>
 					Закрити
-				</Button>
-				<Button variant="outline-success" onClick={handleCreateParagraph}>
-					Додати
 				</Button>
 			</Modal.Footer>
 		</Modal>

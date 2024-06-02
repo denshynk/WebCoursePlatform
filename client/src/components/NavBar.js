@@ -7,6 +7,7 @@ import { NavLink } from "react-router-dom";
 import {
 	ACOUNT_ROUTE,
 	ADMIN_ROUTE,
+	ALL_COURSES_ROUTE,
 	BASKET_COURSE_ROUTE,
 	LOGIN_ROUTE,
 } from "../utils/consts.js";
@@ -31,6 +32,12 @@ const NavBar = observer(() => {
 					to={ACOUNT_ROUTE}
 				>
 					KPI Web-Course
+				</NavLink>
+				<NavLink
+					style={{ color: "white", textDecoration: "none" }}
+					to={ALL_COURSES_ROUTE}
+				>
+					all-courses
 				</NavLink>
 				{user.isAuth ? (
 					<Nav className="ml-auto" style={{ color: "white" }}>

@@ -25,7 +25,6 @@ const Course = () => {
 	const [timeLeft, setTimeLeft] = useState(300);
 	const [testCompleted, setTestCompleted] = useState(false);
 
-
 	useEffect(() => {
 		let timer;
 		if (showTest && timeLeft > 0) {
@@ -100,30 +99,34 @@ const Course = () => {
 			<Row className="mt-5">
 				<Col md={4}>
 					<h2>Материал курса</h2>
-					{course?.paragraphs?.map((par) => (
-						<div key={par.id}>
-							<h5
-								className="mt-3"
-								style={{ cursor: "pointer" }}
-								onClick={() => handleParagraphClick(par.id)}
-							>
-								{par.title}
-							</h5>
-							<ul>
-								{par?.themes?.map((t) => (
-									<li key={t.id}>
-										<Button
-											style={{ textDecoration: "none", color: "grey" }}
-											variant="link"
-											onClick={() => handleThemeClick(t)}
-										>
-											{t.title}
-										</Button>
-									</li>
-								))}
-							</ul>
-						</div>
-					))}
+					{course?.paragraphs
+						?.sort((a, b) => a.id - b.id)
+						?.map((par) => (
+							<div key={par.id}>
+								<h5
+									className="mt-3"
+									style={{ cursor: "pointer" }}
+									onClick={() => handleParagraphClick(par.id)}
+								>
+									{par.title}
+								</h5>
+								<ul>
+									{par?.themes
+										?.sort((a, b) => a.id - b.id)
+										?.map((t) => (
+											<li key={t.id}>
+												<Button
+													style={{ textDecoration: "none", color: "grey" }}
+													variant="link"
+													onClick={() => handleThemeClick(t)}
+												>
+													{t.title}
+												</Button>
+											</li>
+										))}
+								</ul>
+							</div>
+						))}
 				</Col>
 				<Col md={8}>
 					{selectedParagraph && (
@@ -155,12 +158,14 @@ const Course = () => {
 									</div>
 								))}
 							{/* Дополнительные тексты */}
-							{selectedTheme?.them_texts?.map((them_texts) => (
-								<div key={them_texts.id}>
-									<h2>{them_texts.title}</h2>
-									<p>{them_texts.text}</p>
-								</div>
-							))}
+							{selectedTheme?.them_texts
+								?.sort((a, b) => a.number - b.number)
+								?.map((them_texts) => (
+									<div key={them_texts.id}>
+										<h2>{them_texts.title}</h2>
+										<p>{them_texts.text}</p>
+									</div>
+								))}
 							{selectedTheme &&
 								selectedTheme.test &&
 								!showTest &&

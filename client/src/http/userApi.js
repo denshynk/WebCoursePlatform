@@ -42,22 +42,9 @@ export const login = async (email, password) => {
 };
 
 export const check = async () => {
-	try {
-		const token = localStorage.getItem("token");
-		if (!token) {
-			console.log("Токен отсутствует, пропускаем проверку.");
-			return null; // или выбросить исключение, если это необходимо
-		}
-
-		const { data } = await $authHost.get("api/user/auth");
-		localStorage.setItem("token", data.token);
-		return jwtDecode(data.token);
-	} catch (error) {
-		if (error.response && error.response.status === 401) {
-			console.error("Ошибка авторизации:", error.response.data.message);
-		} else {
-			console.error("Произошла ошибка:", error.message);
-		}
-		return null; // Возвращаем null при ошибке авторизации
-	}
+	const { data } = await $authHost.get('api/user/auth')
+	localStorage.setItem('token', data.token)
+	const dataToken = jwtDecode(data.token);
+	const userData = data.dataUser;
+	return { dataToken, userData };
 };

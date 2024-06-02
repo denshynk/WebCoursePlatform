@@ -13,7 +13,7 @@ const CourseIten = ({ course }) => {
         <div className="text-black-50">
           <div >Веб Програмування</div>
         </div>
-        <div>JavaScript</div>
+        <div>{course.title}</div>
 			</Card>
 		</Col>
 	);

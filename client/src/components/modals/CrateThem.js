@@ -1,15 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
-import { createTheme, fetchCourse, fetchParagraph } from "../../http/courseApi";
+import { Button, Form, Modal, ListGroup } from "react-bootstrap";
+import {
+	createTheme,
+	fetchCourse,
+	fetchParagraph,
+	fetchTheme,
+	updateTheme,
+	deleteTheme,
+	updateText,
+	deleteText,
+} from "../../http/courseApi";
 
 const CreateTheme = ({ show, onHide }) => {
 	const [themeTitle, setThemeTitle] = useState("");
 	const [themeText, setThemeText] = useState("");
+
 	const [courses, setCourses] = useState([]);
 	const [selectedCourseId, setSelectedCourseId] = useState("");
 	const [selectedParagraphId, setSelectedParagraphId] = useState("");
+	const [selectedThemeId, setSelectedThemeId] = useState();
+	const [selectedThemeTextes, setSelectedThemeTexts] = useState([]);
+
 	const [paragraphs, setParagraphs] = useState([]);
+	const [themes, setThemes] = useState([]);
 	const [texts, setTexts] = useState([]);
+	const [isCreatingNewTheme, setIsCreatingNewTheme] = useState(false);
+	const [isEditingTheme, setIsEditingTheme] = useState(false);
+
+	const [editingTheme, setEditingTheme] = useState(null);
+	const [editingThemeTitle, setEditingThemeTitle] = useState("");
+	const [editingThemeText, setEditingThemeText] = useState("");
+
+	const [editingText, setEditingText] = useState(null);
+	const [editingTextTitle, setEditingTextTitle] = useState("");
+	const [editingTextText, setEditingTextText] = useState("");
 
 	useEffect(() => {
 		const fetchCourses = async () => {
@@ -19,21 +43,42 @@ const CreateTheme = ({ show, onHide }) => {
 			} catch (error) {
 				console.error("Error fetching courses:", error);
 			}
+		
 		};
+		if (show) fetchCourses();
+	}, [show, ]);
 
-		fetchCourses();
-	}, []);
+	useEffect(() => {
+		const fetchParagraphsForCourse = async () => {
+			try {
+				if (selectedCourseId) {
+					const data = await fetchParagraph(selectedCourseId);
+					setParagraphs(data);
+				} else {
+					setParagraphs([]);
+				}
+			} catch (error) {
+				console.error("Error fetching paragraphs:", error);
+			}
+		};
+		fetchParagraphsForCourse();
+	}, [selectedCourseId]);
 
-	const handleCourseChange = async (e) => {
-		const courseId = e.target.value;
-		setSelectedCourseId(courseId);
-		try {
-			const data = await fetchParagraph(courseId);
-			setParagraphs(data);
-		} catch (error) {
-			console.error("Error fetching paragraphs:", error);
-		}
-	};
+	useEffect(() => {
+		const fetchThemesForParagraph = async () => {
+			try {
+				if (selectedParagraphId) {
+					const data = await fetchTheme(selectedParagraphId);
+					setThemes(data);
+				} else {
+					setThemes([]);
+				}
+			} catch (error) {
+				console.error("Error fetching paragraphs:", error);
+			}
+		};
+		fetchThemesForParagraph();
+	}, [selectedParagraphId]);
 
 	const handleAddText = () => {
 		const newNumber = texts.length + 1;
@@ -41,6 +86,25 @@ const CreateTheme = ({ show, onHide }) => {
 	};
 
 	const handleRemoveText = (index) => {
+		const updatedTexts = [...texts];
+		updatedTexts.splice(index, 1);
+		setTexts(updatedTexts);
+	};
+
+	const handleAddCurentText = () => {
+		const maxNumber = selectedThemeTextes.reduce((max, text) => {
+			return text.number > max ? text.number : max;
+		}, 0);
+		const newNumber = maxNumber + 1;
+		
+		setSelectedThemeTexts([
+			...selectedThemeTextes,
+			{ title: "", text: "", number: newNumber, themeId: parseInt(selectedThemeId) },
+		]);
+		
+	};
+
+	const handleRemoveCurentText = (index) => {
 		const updatedTexts = [...texts];
 		updatedTexts.splice(index, 1);
 		setTexts(updatedTexts);
@@ -54,7 +118,6 @@ const CreateTheme = ({ show, onHide }) => {
 				paragraphId: selectedParagraphId,
 				texts: texts,
 			};
-			console.log(theme);
 			const data = await createTheme(theme);
 			console.log("Theme created successfully:", data);
 			onHide();
@@ -63,17 +126,104 @@ const CreateTheme = ({ show, onHide }) => {
 		}
 	};
 
+	const handleUpdateTheme = async () => {
+		try {
+			const updatedTheme = {
+				id: selectedThemeId,
+				title: themeTitle,
+				text: themeText,
+				paragraphId: selectedParagraphId,
+				texts: texts,
+			};
+			await updateTheme(updatedTheme);
+			console.log("Theme updated successfully");
+			onHide();
+		} catch (error) {
+			console.error("Error updating theme:", error);
+		}
+	};
+
+	const handleUpdateText = async () => {
+		try {
+			const updatedText = {
+				...editingText,
+				title: editingTextTitle,
+				text: editingTextText,
+			};
+			console.log(updatedText)
+
+			await updateText(updatedText);
+			const data = await fetchParagraph(selectedCourseId);
+			setTexts(data);
+			setEditingText(null);
+			setEditingTextTitle("");
+			setEditingTextText("");
+		} catch (error) {
+			console.error("Error updating paragraph:", error);
+		}
+	};
+
+	const handleDeleteTheme = async () => {
+		try {
+			await deleteTheme(selectedThemeId);
+			console.log("Theme deleted successfully");
+			setSelectedThemeId("");
+			setThemeTitle("");
+			setThemeText("");
+			setTexts([]);
+			onHide();
+		} catch (error) {
+			console.error("Error deleting theme:", error);
+		}
+	};
+
+	const handleDeleteText = async (id) => {
+		try {
+			console.log(id);
+			await deleteText(id);
+
+			setThemes(themes.them_texts.filter((text) => text.id !== id));
+		} catch (error) {
+			console.error("Error deleting paragraph:", error);
+		}
+	};
+
+	const handleThemeSelect = (e) => {
+		const themeId = e.target.value;
+		setSelectedThemeId(themeId);
+		const selectedTheme = themes.find(
+			(theme) => theme.id === parseInt(themeId)
+		);
+		if (selectedTheme) {
+			setSelectedThemeTexts(selectedTheme.them_texts);
+		} else {
+			setSelectedThemeTexts([]);
+		}
+	};
+
+	const resetForm = () => {
+		setThemeTitle("");
+		setThemeText("");
+		setTexts([]);
+		setSelectedThemeId("");
+		setIsCreatingNewTheme(false);
+		setIsEditingTheme(false);
+	};
+
 	return (
 		<Modal
 			show={show}
-			onHide={onHide}
+			onHide={() => {
+				resetForm();
+				onHide();
+			}}
 			size="lg"
 			aria-labelledby="contained-modal-title-vcenter"
 			centered
 		>
 			<Modal.Header closeButton>
 				<Modal.Title id="contained-modal-title-vcenter">
-					Create Theme
+					Create or Edit Theme
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
@@ -83,7 +233,7 @@ const CreateTheme = ({ show, onHide }) => {
 						<Form.Control
 							as="select"
 							value={selectedCourseId}
-							onChange={handleCourseChange}
+							onChange={(e) => setSelectedCourseId(e.target.value)}
 						>
 							<option value="" disabled>
 								Select Course
@@ -112,95 +262,316 @@ const CreateTheme = ({ show, onHide }) => {
 							))}
 						</Form.Control>
 					</Form.Group>
-					<Form.Label className="mt-2">Theme Title</Form.Label>
-					<Form.Control
-						placeholder="Theme Title"
-						value={themeTitle}
-						onChange={(e) => setThemeTitle(e.target.value)}
-					/>
-
-					<Form.Group controlId="formThemeText" className="mt-3">
-						<Form.Label>Theme Text</Form.Label>
-						<Form.Control
-							as="textarea"
-							rows={5}
-							value={themeText}
-							onChange={(e) => setThemeText(e.target.value)}
-							maxLength={5000}
-						/>
-						<div className="text-muted text-right">{themeText.length}/5000</div>
-					</Form.Group>
-					{texts.length === 0 && (
-						<Button variant="outline-primary" onClick={handleAddText}>
-							Add Text
-						</Button>
-					)}
-
-					{texts.map((text, index) => (
-						<div key={index}>
-							<Form.Group controlId={`formTextTitle${index}`} className="mt-3">
-								<Form.Label>Text Title</Form.Label>
-								<Form.Control
-									type="text"
-									placeholder="Enter title"
-									value={text.title}
-									onChange={(e) => {
-										const updatedTexts = [...texts];
-										updatedTexts[index].title = e.target.value;
-										setTexts(updatedTexts);
-									}}
-								/>
-							</Form.Group>
-							<Form.Group
-								controlId={`formTextContent${index}`}
+					{selectedParagraphId && (
+						<>
+							<Form.Check
+								type="radio"
+								label="Create New Theme"
+								name="themeOption"
+								id="createNewTheme"
 								className="mt-3"
-							>
-								<Form.Label>Text Content</Form.Label>
+								checked={isCreatingNewTheme}
+								onChange={() => {
+									setIsCreatingNewTheme(true);
+									setIsEditingTheme(false);
+								}}
+							/>
+							<Form.Check
+								type="radio"
+								label="Edit or Delete Existing Theme"
+								name="themeOption"
+								id="editExistingTheme"
+								className="mt-2"
+								checked={isEditingTheme}
+								onChange={() => {
+									setIsEditingTheme(true);
+									setIsCreatingNewTheme(false);
+									setTexts([]);
+								}}
+							/>
+						</>
+					)}
+					{isCreatingNewTheme && (
+						<>
+							<Form.Label className="mt-2">Theme Title</Form.Label>
+							<Form.Control
+								placeholder="Theme Title"
+								value={themeTitle}
+								onChange={(e) => setThemeTitle(e.target.value)}
+							/>
+
+							<Form.Group controlId="formThemeText" className="mt-3">
+								<Form.Label>Theme Text</Form.Label>
 								<Form.Control
 									as="textarea"
 									rows={5}
-									placeholder="Enter content"
-									value={text.content}
-									maxLength={2500}
-									onChange={(e) => {
-										const updatedTexts = [...texts];
-										updatedTexts[index].content = e.target.value;
-										setTexts(updatedTexts);
-									}}
+									value={themeText}
+									onChange={(e) => setThemeText(e.target.value)}
+									maxLength={5000}
 								/>
-								<div className="text-muted text-right"></div>
+								<div className="text-muted text-right">
+									{themeText.length}/5000
+								</div>
 							</Form.Group>
-							<Modal.Footer className="d-flex justify-content-start">
-								{texts.length > 0 && (
-									<Button
-										className="mt-2"
-										variant="outline-danger"
-										onClick={() => handleRemoveText(index)}
+							{texts.length === 0 && (
+								<Button variant="outline-primary" onClick={handleAddText}>
+									Add Text
+								</Button>
+							)}
+
+							{texts.map((text, index) => (
+								<div key={index}>
+									<Form.Group
+										controlId={`formTextTitle${index}`}
+										className="mt-3"
 									>
-										Remove Text
-									</Button>
-								)}
-								{index === texts.length - 1 && (
-									<Button
-										className="mt-2"
-										variant="outline-primary"
-										onClick={handleAddText}
+										<Form.Label>Text Title</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder="Enter title"
+											value={text.title}
+											onChange={(e) => {
+												const updatedTexts = [...texts];
+												updatedTexts[index].title = e.target.value;
+												setTexts(updatedTexts);
+											}}
+										/>
+									</Form.Group>
+									<Form.Group
+										controlId={`formTextContent${index}`}
+										className="mt-3"
 									>
-										Add Text
-									</Button>
-								)}
-							</Modal.Footer>
-						</div>
-					))}
+										<Form.Label>Text Content</Form.Label>
+										<Form.Control
+											as="textarea"
+											rows={5}
+											placeholder="Enter content"
+											value={text.content}
+											maxLength={2500}
+											onChange={(e) => {
+												const updatedTexts = [...texts];
+												updatedTexts[index].content = e.target.value;
+												setTexts(updatedTexts);
+											}}
+										/>
+										<div className="text-muted text-right">
+											{text.content.length}/2500
+										</div>
+									</Form.Group>
+									<Modal.Footer className="d-flex justify-content-start">
+										{texts.length > 0 && (
+											<Button
+												className="mt-2"
+												variant="outline-danger"
+												onClick={() => handleRemoveText(index)}
+											>
+												Remove Text
+											</Button>
+										)}
+										{index === texts.length - 1 && (
+											<Button
+												className="mt-2"
+												variant="outline-primary"
+												onClick={handleAddText}
+											>
+												Add Text
+											</Button>
+										)}
+									</Modal.Footer>
+								</div>
+							))}
+						</>
+					)}
+
+					{isEditingTheme && (
+						<>
+							<Form.Group controlId="formThemeSelect" className="mt-3">
+								<Form.Label>Select Theme</Form.Label>
+								<Form.Control
+									as="select"
+									value={selectedThemeId}
+									onChange={handleThemeSelect}
+								>
+									<option value="" disabled>
+										Select Theme
+									</option>
+									{themes.map((theme) => (
+										<option key={theme.id} value={theme.id}>
+											{theme.title}
+										</option>
+									))}
+								</Form.Control>
+							</Form.Group>
+							{selectedThemeId && (
+								<>
+									<h5 className="mt-4">Тема</h5>
+									{themes
+										.filter((theme) => theme.id === parseInt(selectedThemeId))
+										.map((theme) => (
+											<ListGroup key={theme.id}>
+												<ListGroup>
+													<ListGroup.Item variant="primary">
+														{editingTheme === theme ? (
+															<Form.Control
+																type="text"
+																value={editingThemeTitle}
+																onChange={(e) =>
+																	setEditingThemeTitle(e.target.value)
+																}
+															/>
+														) : (
+															theme.title
+														)}
+													</ListGroup.Item>
+													<ListGroup.Item variant="primary">
+														{editingTheme === theme ? (
+															<Form.Control
+																as="textarea"
+																rows={5}
+																value={editingThemeText}
+																onChange={(e) =>
+																	setEditingThemeText(e.target.value)
+																}
+															/>
+														) : (
+															theme.description
+														)}
+													</ListGroup.Item>
+												</ListGroup>
+												<Modal.Footer
+													style={{
+														border: "0",
+														paddingTop: "0",
+														justifyContent: "start",
+													}}
+												>
+													{editingTheme === theme ? (
+														<Button
+															variant="outline-success"
+															onClick={handleUpdateTheme}
+														>
+															Зберегти
+														</Button>
+													) : (
+														<Button
+															variant="outline-primary"
+															onClick={() => {
+																setEditingTheme(theme);
+																setEditingThemeTitle(theme.title);
+																setEditingThemeText(theme.description);
+																setEditingText(null);
+															}}
+														>
+															Редагувати
+														</Button>
+													)}
+												</Modal.Footer>
+
+												<h6 className="mt-2 ">Тексти</h6>
+
+												{selectedThemeTextes.map((text) => (
+													<div>
+														<ListGroup className="mb-2" key={text.number}>
+															<ListGroup.Item>
+																{editingText === text ? (
+																	<Form.Control
+																		type="text"
+																		value={editingTextTitle}
+																		onChange={(e) =>
+																			setEditingTextTitle(e.target.value)
+																		}
+																	/>
+																) : (
+																	text.title
+																)}
+															</ListGroup.Item>
+															<ListGroup.Item>
+																{editingText === text ? (
+																	<Form.Control
+																		as="textarea"
+																		rows={5}
+																		value={editingTextText}
+																		onChange={(e) =>
+																			setEditingTextText(e.target.value)
+																		}
+																	/>
+																) : (
+																	text.text
+																)}
+															</ListGroup.Item>
+														</ListGroup>
+														<Modal.Footer
+															style={{
+																border: "0",
+																paddingTop: "0",
+																justifyContent: "start",
+															}}
+														>
+															{editingText === text ? (
+																<Button
+																	variant="outline-success"
+																	onClick={handleUpdateText}
+																>
+																	Зберегти
+																</Button>
+															) : (
+																<Button
+																	variant="outline-primary"
+																	onClick={() => {
+																		setEditingText(text);
+																		setEditingTextTitle(text.title);
+																		setEditingTextText(text.text);
+																		setEditingTheme(null);
+																	}}
+																>
+																	Редагувати
+																</Button>
+															)}
+															<Button
+																variant="outline-danger"
+																onClick={() => handleDeleteText(text.id)}
+															>
+																Видалити
+															</Button>
+														</Modal.Footer>
+													</div>
+												))}
+											</ListGroup>
+										))}
+								</>
+							)}
+						</>
+					)}
 				</Form>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-danger" onClick={onHide}>
+				<Button
+					variant="outline-danger"
+					onClick={() => {
+						resetForm();
+						onHide();
+					}}
+				>
 					Close
 				</Button>
-				<Button variant="outline-success" onClick={() => handleCreateTheme}>
-					Add
-				</Button>
+				{isCreatingNewTheme ? (
+					<Button variant="outline-success" onClick={handleCreateTheme}>
+						Add
+					</Button>
+				) : (
+					<>
+						<Button variant="outline-danger" onClick={handleDeleteTheme}>
+							Delete
+						</Button>
+						<Button
+							className="mt-2"
+							variant="outline-primary"
+							onClick={handleAddCurentText}
+						>
+							Add Text
+						</Button>
+					</>
+				)}
 			</Modal.Footer>
 		</Modal>
 	);

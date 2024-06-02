@@ -3,7 +3,9 @@ import { Button, Card, Col, Container, Form } from "react-bootstrap";
 import Row from "react-bootstrap/Row";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
+	ACOUNT_ROUTE,
 	ALL_COURSES_ROUTE,
+	BASKET_COURSE_ROUTE,
 	LOGIN_ROUTE,
 	REGISTRATION_ROUTE,
 } from "../utils/consts";
@@ -27,8 +29,9 @@ const Auth = observer(() => {
 	);
 
 	useEffect(() => {
+
 		localStorage.setItem("isRegistrationRequested", isRegistrationRequested);
-	}, [isRegistrationRequested]);
+	}, [isRegistrationRequested, user]);
 
 	const click = async () => {
 		try {
@@ -37,7 +40,7 @@ const Auth = observer(() => {
 				data = await login(email, password);
 				user.setUser(data.userData);
 				user.setIsAuth(true);
-				navigate(ALL_COURSES_ROUTE);
+				navigate(ACOUNT_ROUTE);
 			} else {
 				data = await registration(
 					email,
@@ -81,6 +84,7 @@ const Auth = observer(() => {
 								placeholder="Введіть email"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
+								autoComplete="email" // добавлено autocomplete для email
 							/>
 							<Form.Control
 								className="mt-4"
@@ -88,6 +92,7 @@ const Auth = observer(() => {
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								type="password"
+								autoComplete="current-password" // добавлено autocomplete для пароля
 							/>
 							{!isLogin && (
 								<>
