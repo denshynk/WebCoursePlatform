@@ -43,13 +43,13 @@ export const createTheme = async (theme) => {
 
 export const updateText = async (updatedText) => {
 	const { data } = await $authHost.post(
-		"api/theme/theme_text",
+		"api/theme/updateThemeText",
 		updatedText
 	);
 	return data;
 };
 export const deleteText = async (id) => {
-	const { data } = await $authHost.delete("api/theme/theme_text/delete" + id);
+	const { data } = await $authHost.delete("api/theme/theme_text/delete/" + id);
 	return data;
 };
 
@@ -67,18 +67,13 @@ export const fetchTheme = async (paragraphId) => {
 	return data;
 };
 
-export const updateTheme = async (updatedParagraph) => {
-	const { data } = await $authHost.post(
-		"api/paragraph/updateParagraph22",
-		updatedParagraph
-	);
+export const updateTheme = async (updatedTheme) => {
+	const { data } = await $authHost.post("api/theme/updateTheme", updatedTheme);
 	return data;
 };
 
 export const deleteTheme = async (id) => {
-	const { data } = await $authHost.delete(
-		"api/paragraph/deleteParagraphыв/" + id
-	);
+	const { data } = await $authHost.delete("api/theme/delete/" + id);
 	return data;
 };
 

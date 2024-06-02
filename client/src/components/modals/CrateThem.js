@@ -32,6 +32,7 @@ const CreateTheme = ({ show, onHide }) => {
 	const [editingThemeText, setEditingThemeText] = useState("");
 
 	const [editingText, setEditingText] = useState(null);
+	const [editingTextNumber, setEditingTextNumber] = useState("");
 	const [editingTextTitle, setEditingTextTitle] = useState("");
 	const [editingTextText, setEditingTextText] = useState("");
 
@@ -43,10 +44,9 @@ const CreateTheme = ({ show, onHide }) => {
 			} catch (error) {
 				console.error("Error fetching courses:", error);
 			}
-		
 		};
 		if (show) fetchCourses();
-	}, [show, ]);
+	}, [show]);
 
 	useEffect(() => {
 		const fetchParagraphsForCourse = async () => {
@@ -96,12 +96,16 @@ const CreateTheme = ({ show, onHide }) => {
 			return text.number > max ? text.number : max;
 		}, 0);
 		const newNumber = maxNumber + 1;
-		
+
 		setSelectedThemeTexts([
 			...selectedThemeTextes,
-			{ title: "", text: "", number: newNumber, themeId: parseInt(selectedThemeId) },
+			{
+				title: "",
+				text: "",
+				number: newNumber,
+				themeId: parseInt(selectedThemeId),
+			},
 		]);
-		
 	};
 
 	const handleRemoveCurentText = (index) => {
@@ -130,14 +134,12 @@ const CreateTheme = ({ show, onHide }) => {
 		try {
 			const updatedTheme = {
 				id: selectedThemeId,
-				title: themeTitle,
-				text: themeText,
+				title: editingThemeTitle,
+				description: editingThemeText,
 				paragraphId: selectedParagraphId,
-				texts: texts,
 			};
 			await updateTheme(updatedTheme);
 			console.log("Theme updated successfully");
-			onHide();
 		} catch (error) {
 			console.error("Error updating theme:", error);
 		}
@@ -149,12 +151,18 @@ const CreateTheme = ({ show, onHide }) => {
 				...editingText,
 				title: editingTextTitle,
 				text: editingTextText,
+				number: parseInt(editingTextNumber),
 			};
-			console.log(updatedText)
 
 			await updateText(updatedText);
-			const data = await fetchParagraph(selectedCourseId);
-			setTexts(data);
+			const data = await fetchTheme(selectedParagraphId);
+			setThemes(data);
+			const selectedTheme = themes.find(
+				(theme) => theme.id === parseInt(selectedThemeId)
+			);
+			setSelectedThemeTexts(selectedTheme.them_texts);
+
+			console.log(selectedThemeTextes);
 			setEditingText(null);
 			setEditingTextTitle("");
 			setEditingTextText("");
@@ -179,12 +187,12 @@ const CreateTheme = ({ show, onHide }) => {
 
 	const handleDeleteText = async (id) => {
 		try {
-			console.log(id);
 			await deleteText(id);
-
-			setThemes(themes.them_texts.filter((text) => text.id !== id));
+			setSelectedThemeTexts(
+				selectedThemeTextes.filter((text) => text.id !== id)
+			);
 		} catch (error) {
-			console.error("Error deleting paragraph:", error);
+			console.error("Error deleting text:", error);
 		}
 	};
 
@@ -276,19 +284,21 @@ const CreateTheme = ({ show, onHide }) => {
 									setIsEditingTheme(false);
 								}}
 							/>
-							<Form.Check
-								type="radio"
-								label="Edit or Delete Existing Theme"
-								name="themeOption"
-								id="editExistingTheme"
-								className="mt-2"
-								checked={isEditingTheme}
-								onChange={() => {
-									setIsEditingTheme(true);
-									setIsCreatingNewTheme(false);
-									setTexts([]);
-								}}
-							/>
+							{themes.length > 0 && (
+								<Form.Check
+									type="radio"
+									label="Edit or Delete Existing Theme"
+									name="themeOption"
+									id="editExistingTheme"
+									className="mt-2"
+									checked={isEditingTheme}
+									onChange={() => {
+										setIsEditingTheme(true);
+										setIsCreatingNewTheme(false);
+										setTexts([]);
+									}}
+								/>
+							)}
 						</>
 					)}
 					{isCreatingNewTheme && (
@@ -406,7 +416,9 @@ const CreateTheme = ({ show, onHide }) => {
 								<>
 									<h5 className="mt-4">Тема</h5>
 									{themes
+
 										.filter((theme) => theme.id === parseInt(selectedThemeId))
+
 										.map((theme) => (
 											<ListGroup key={theme.id}>
 												<ListGroup>
@@ -459,6 +471,7 @@ const CreateTheme = ({ show, onHide }) => {
 																setEditingTheme(theme);
 																setEditingThemeTitle(theme.title);
 																setEditingThemeText(theme.description);
+
 																setEditingText(null);
 															}}
 														>
@@ -469,73 +482,89 @@ const CreateTheme = ({ show, onHide }) => {
 
 												<h6 className="mt-2 ">Тексти</h6>
 
-												{selectedThemeTextes.map((text) => (
-													<div>
-														<ListGroup className="mb-2" key={text.number}>
-															<ListGroup.Item>
-																{editingText === text ? (
-																	<Form.Control
-																		type="text"
-																		value={editingTextTitle}
-																		onChange={(e) =>
-																			setEditingTextTitle(e.target.value)
-																		}
-																	/>
-																) : (
-																	text.title
-																)}
-															</ListGroup.Item>
-															<ListGroup.Item>
-																{editingText === text ? (
-																	<Form.Control
-																		as="textarea"
-																		rows={5}
-																		value={editingTextText}
-																		onChange={(e) =>
-																			setEditingTextText(e.target.value)
-																		}
-																	/>
-																) : (
-																	text.text
-																)}
-															</ListGroup.Item>
-														</ListGroup>
-														<Modal.Footer
-															style={{
-																border: "0",
-																paddingTop: "0",
-																justifyContent: "start",
-															}}
-														>
-															{editingText === text ? (
-																<Button
-																	variant="outline-success"
-																	onClick={handleUpdateText}
-																>
-																	Зберегти
-																</Button>
-															) : (
-																<Button
-																	variant="outline-primary"
-																	onClick={() => {
-																		setEditingText(text);
-																		setEditingTextTitle(text.title);
-																		setEditingTextText(text.text);
-																		setEditingTheme(null);
-																	}}
-																>
-																	Редагувати
-																</Button>
-															)}
-															<Button
-																variant="outline-danger"
-																onClick={() => handleDeleteText(text.id)}
+												{selectedThemeTextes
+													.sort((a, b) => a.number - b.number)
+													.map((text) => (
+														<div>
+															<ListGroup className="mb-2" key={text.id}>
+																<ListGroup.Item>
+																	{editingText === text ? (
+																		<Form.Control
+																			type="number"
+																			value={editingTextNumber}
+																			onChange={(e) =>
+																				setEditingTextNumber(e.target.value)
+																			}
+																		/>
+																	) : (
+																		text.number
+																	)}
+																</ListGroup.Item>
+																<ListGroup.Item>
+																	{editingText === text ? (
+																		<Form.Control
+																			type="text"
+																			value={editingTextTitle}
+																			onChange={(e) =>
+																				setEditingTextTitle(e.target.value)
+																			}
+																		/>
+																	) : (
+																		text.title
+																	)}
+																</ListGroup.Item>
+																<ListGroup.Item>
+																	{editingText === text ? (
+																		<Form.Control
+																			as="textarea"
+																			rows={5}
+																			value={editingTextText}
+																			onChange={(e) =>
+																				setEditingTextText(e.target.value)
+																			}
+																		/>
+																	) : (
+																		text.text
+																	)}
+																</ListGroup.Item>
+															</ListGroup>
+															<Modal.Footer
+																style={{
+																	border: "0",
+																	paddingTop: "0",
+																	justifyContent: "start",
+																}}
 															>
-																Видалити
-															</Button>
-														</Modal.Footer>
-													</div>
-												))}
+																{editingText === text ? (
+																	<Button
+																		variant="outline-success"
+																		onClick={handleUpdateText}
+																	>
+																		Зберегти
+																	</Button>
+																) : (
+																	<Button
+																		variant="outline-primary"
+																		onClick={() => {
+																			setEditingText(text);
+																			setEditingTextTitle(text.title);
+																			setEditingTextText(text.text);
+																			setEditingTextNumber(text.number);
+																			setEditingTheme(null);
+																		}}
+																	>
+																		Редагувати
+																	</Button>
+																)}
+																<Button
+																	variant="outline-danger"
+																	onClick={() => handleDeleteText(text.id)}
+																>
+																	Видалити
+																</Button>
+															</Modal.Footer>
+														</div>
+													))}
 											</ListGroup>
 										))}
 								</>
