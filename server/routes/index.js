@@ -22,7 +22,7 @@ router.use("/test", testRouter);
 router.use("/userAnswer", userAnswer);
 router.use('/answer', answerRouter)
 router.use('/finalResult', finalResultRouter)
-router.use("/testcategory", testcategory);
+router.use("/questionCategory", testcategory);
 
 
 

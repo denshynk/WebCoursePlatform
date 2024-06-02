@@ -41,9 +41,9 @@ const ThemText = sequelize.define("them_text", {
 
 const Test = sequelize.define("test", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	title: { type: DataTypes.STRING, allowNull: false},
+	title: { type: DataTypes.STRING, allowNull: false },
 	time: { type: DataTypes.INTEGER, allowNull: false },
-	atemps: { type:DataTypes.INTEGER,allowNull:false},
+	atemps: { type: DataTypes.INTEGER, allowNull: false },
 	themeId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Theme
 });
 
@@ -83,7 +83,7 @@ const UserAnswer = sequelize.define("user_answer", {
 	userAnswers: { type: DataTypes.STRING, allowNull: false },
 	questionTitle: { type: DataTypes.STRING, allowNull: false },
 	IsCorect: { type: DataTypes.BOOLEAN, allowNull: false },
-	atemp: {type: DataTypes.INTEGER,  allowNull: false }
+	atemp: { type: DataTypes.INTEGER, allowNull: false },
 });
 
 const PreRegistration = sequelize.define("pre_registration", {
@@ -115,8 +115,8 @@ Theme.belongsTo(Paragraph);
 Theme.hasMany(Test);
 Test.belongsTo(Theme);
 
-TestCategory.hasMany(Test);
-Test.belongsTo(TestCategory);
+TestCategory.hasMany(Question);
+Question.belongsTo(TestCategory);
 
 Test.hasMany(UserAnswer);
 UserAnswer.belongsTo(Test);
@@ -137,7 +137,7 @@ Test.hasMany(UserAnswer);
 UserAnswer.belongsTo(Test);
 
 Question.hasMany(UserAnswer);
-UserAnswer.belongsTo(Question)
+UserAnswer.belongsTo(Question);
 
 Test.hasMany(Question);
 Question.belongsTo(Test);
@@ -158,5 +158,5 @@ module.exports = {
 	UserCourse,
 	ThemText,
 	TestCategory,
-	Question
+	Question,
 };

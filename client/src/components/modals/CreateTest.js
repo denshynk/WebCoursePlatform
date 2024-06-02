@@ -5,24 +5,30 @@ import {
 	fetchParagraph,
 	createTest,
 	fetchTheme,
-	fetchTestCategory,
+	fetchQuestionCategory,
 } from "../../http/courseApi";
 
 const CreateTest = ({ show, onHide }) => {
-	const [testTitle, setTestTitle] = useState("");
 	const [courses, setCourses] = useState([]);
-	const [testCategory, setTestCategory] = useState([]);
+	const [paragraphs, setParagraphs] = useState([]);
+	const [themes, setThemes] = useState([]);
+	const [questionCategory, setQuestionCategory] = useState([]);
+
 	const [selectedCourseId, setSelectedCourseId] = useState("");
 	const [selectedThemeId, setSelectedThemeId] = useState("");
 	const [selectedParagraphId, setSelectedParagraphId] = useState("");
-	const [selectedCategoryId, setSelectedCategoryId] = useState("");
-	const [paragraphs, setParagraphs] = useState([]);
-	const [themes, setThemes] = useState([]);
+
+
+	const [testAtemps, setTestAtemps] = useState("");
+	const [testTime, setTestTime] = useState("");
+	const [testTitle, setTestTitle] = useState("");
 	const [questions, setQuestions] = useState([
 		{
 			question: "",
 			answers: ["", "", ""],
+			correctAnswerIndex: null,
 			correctAnswer: "",
+			categoryId: "",
 		},
 	]);
 
@@ -40,16 +46,16 @@ const CreateTest = ({ show, onHide }) => {
 	}, []);
 
 	useEffect(() => {
-		const fetchTestCategories = async () => {
+		const fetchQuestionCategories = async () => {
 			try {
-				const data = await fetchTestCategory();
-				setTestCategory(data);
+				const data = await fetchQuestionCategory();
+				setQuestionCategory(data);
 			} catch (error) {
 				console.error("Error fetching test categories:", error);
 			}
 		};
 
-		fetchTestCategories();
+		fetchQuestionCategories();
 	}, []);
 
 	const handleCourseChange = async (e) => {
@@ -82,7 +88,9 @@ const CreateTest = ({ show, onHide }) => {
 			{
 				question: "",
 				answers: ["", "", ""],
+				correctAnswerIndex: null,
 				correctAnswer: "",
+				categoryId: "",
 			},
 		]);
 	};
@@ -123,9 +131,17 @@ const CreateTest = ({ show, onHide }) => {
 		setQuestions(updatedQuestions);
 	};
 
-	const handleCorrectAnswerChange = (questionIndex, value) => {
+	const handleCorrectAnswerChange = (questionIndex, answerIndex) => {
 		const updatedQuestions = [...questions];
-		updatedQuestions[questionIndex].correctAnswer = value;
+		updatedQuestions[questionIndex].correctAnswerIndex = answerIndex;
+		updatedQuestions[questionIndex].correctAnswer =
+			updatedQuestions[questionIndex].answers[answerIndex];
+		setQuestions(updatedQuestions);
+	};
+
+	const handleCategoryChange = (questionIndex, value) => {
+		const updatedQuestions = [...questions];
+		updatedQuestions[questionIndex].categoryId = value;
 		setQuestions(updatedQuestions);
 	};
 
@@ -133,11 +149,15 @@ const CreateTest = ({ show, onHide }) => {
 		try {
 			const test = {
 				title: testTitle,
+				atemps: testAtemps,
+				time: testTime,
 				themeId: selectedThemeId,
-				categoryId: selectedCategoryId,
-				questions: questions,
+				questions: questions.map((q) => ({
+					...q,
+					correctAnswer: q.answers[q.correctAnswerIndex],
+				})),
 			};
-			console.log(test)
+			console.log(test);
 			const data = await createTest(test);
 			console.log("Test created successfully:", data);
 			// onHide();
@@ -212,32 +232,33 @@ const CreateTest = ({ show, onHide }) => {
 							))}
 						</Form.Control>
 					</Form.Group>
-					<Form.Group className="mt-2" controlId="formCategorySelect">
-						<Form.Label>Select Category</Form.Label>
-						<Form.Control
-							as="select"
-							value={selectedCategoryId}
-							onChange={(e) => setSelectedCategoryId(e.target.value)}
-						>
-							<option value="" disabled>
-								Select Category
-							</option>
-							{testCategory.map((category) => (
-								<option key={category.id} value={category.id}>
-									{category.CategoryName}
-								</option>
-							))}
-						</Form.Control>
-					</Form.Group>
+
 					<Form.Label className="mt-2">Test Title</Form.Label>
 					<Form.Control
 						placeholder="Test Title"
 						value={testTitle}
 						onChange={(e) => setTestTitle(e.target.value)}
 					/>
+					<Form.Label className="mt-2">
+						Час на проходження(в секундах)
+					</Form.Label>
+					<Form.Control
+						type="number"
+						placeholder="Час на проходження"
+						value={testTime}
+						onChange={(e) => setTestTime(e.target.value)}
+					/>
+					<Form.Label className="mt-2">Кількість спроб</Form.Label>
+					<Form.Control
+						type="number"
+						placeholder="Кількість спроб"
+						value={testAtemps}
+						onChange={(e) => setTestAtemps(e.target.value)}
+					/>
 					{questions.map((question, qIndex) => (
 						<div key={qIndex} className="mt-4">
 							<Form.Label>Question {qIndex + 1}</Form.Label>
+
 							<div className="d-flex align-items-center">
 								<Form.Control
 									placeholder="Question"
@@ -253,13 +274,38 @@ const CreateTest = ({ show, onHide }) => {
 									-
 								</Button>
 							</div>
+							<Form.Group className="mt-2" controlId="formCategorySelect">
+								<Form.Label>Select Category</Form.Label>
+								<Form.Control
+									as="select"
+									value={question.categoryId}
+									onChange={(e) => handleCategoryChange(qIndex, e.target.value)}
+								>
+									<option value="" disabled>
+										Select Category
+									</option>
+									{questionCategory.map((category) => (
+										<option key={category.id} value={category.id}>
+											{category.CategoryName}
+										</option>
+									))}
+								</Form.Control>
+							</Form.Group>
 							<Form.Group>
 								<Form.Label className="mt-2">Answers</Form.Label>
 								{question.answers.map((answer, aIndex) => (
 									<div key={aIndex} className="d-flex align-items-center mt-2">
+										<Form.Check
+											type="radio"
+											name={`answerOption${qIndex}`} // Уникальное имя для каждой группы радио-кнопок
+											id={`answer-${qIndex}-${aIndex}`} // Уникальный id для каждой радио-кнопки
+											checked={question.correctAnswerIndex === aIndex} // Проверяем, выбран ли текущий ответ
+											onChange={() => handleCorrectAnswerChange(qIndex, aIndex)}
+										/>
 										<Form.Control
+											className="ml-3"
 											type="text"
-											placeholder={`Answer ${aIndex + 1}`}
+											placeholder={`Answer ${aIndex}`}
 											value={answer}
 											onChange={(e) =>
 												handleAnswerChange(qIndex, aIndex, e.target.value)
@@ -285,16 +331,6 @@ const CreateTest = ({ show, onHide }) => {
 									</Button>
 								)}
 							</Form.Group>
-
-							<Form.Label className="mt-2">Correct Answer</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder="Correct Answer"
-								value={question.correctAnswer}
-								onChange={(e) =>
-									handleCorrectAnswerChange(qIndex, e.target.value)
-								}
-							/>
 						</div>
 					))}
 					<Button

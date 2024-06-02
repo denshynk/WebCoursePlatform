@@ -1,44 +1,37 @@
 const { Test, Question, Answer } = require("../models/models");
 const ApiError = require("../error/ApiError");
 class TestController {
-	 async create(req, res, next) {
-		const transaction = await sequelize.transaction(); // Start a transaction
+	async create(req, res, next) {
 		try {
-			const { title, themeId, categoryId, questions } = req.body;
-			const test = await Test.create(
-				{
-					title,
-					themeId,
-					testCategoryId: categoryId,
-				},
-			);
+			const { title, themeId, time, atemps, questions } = req.body;
+			// Создание теста
+			const test = await Test.create({
+				title,
+				themeId,
+				atemps,
+				time,
+			});
 
+			// Создание вопросов и ответов
 			for (const questionData of questions) {
-				const { question, answers, correctAnswer } = questionData;
+				const { question, answers, correctAnswer, categoryId } = questionData;
 
-				// Create question
-				const newQuestion = await Question.create(
-					{
-						question,
-						answers,
-						testId: test.id,
-					},
-					{ transaction }
-				);
+				// Создание вопроса
+				const newQuestion = await Question.create({
+					title: question,
+					choseAnswer: answers,
+					testCategoryId: categoryId,
+					testId: test.id,
+				});
 
-				await Answer.create(
-					{
-						correctAnswer,
-						questionId: newQuestion.id,
-					},
-					{ transaction }
-				);
+				await Answer.create({
+					text: correctAnswer,
+					questionId: newQuestion.id,
+				});
 			}
 
-			await transaction.commit(); // Commit the transaction
 			return res.json(test);
 		} catch (e) {
-			await transaction.rollback(); // Rollback the transaction
 			next(ApiError.badRequest(e.message));
 		}
 	}

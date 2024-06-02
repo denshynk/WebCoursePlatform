@@ -56,7 +56,6 @@ export const deleteText = async (id) => {
 
 export const createTest = async (test) => {
 	const { data } = await $authHost.post("api/test/create", test);
-
 	return data;
 };
 
@@ -77,8 +76,8 @@ export const deleteTheme = async (id) => {
 	return data;
 };
 
-export const fetchTestCategory = async () => {
-	const { data } = await $authHost.get(`api/testcategory`);
+export const fetchQuestionCategory = async () => {
+	const { data } = await $authHost.get(`api/questionCategory`);
 	return data;
 };
 
