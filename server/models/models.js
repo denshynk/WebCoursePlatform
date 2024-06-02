@@ -41,7 +41,9 @@ const ThemText = sequelize.define("them_text", {
 
 const Test = sequelize.define("test", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	title: { type: DataTypes.STRING },
+	title: { type: DataTypes.STRING, allowNull: false},
+	time: { type: DataTypes.INTEGER, allowNull: false },
+	atemps: { type:DataTypes.INTEGER,allowNull:false},
 	themeId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Theme
 });
 
@@ -59,7 +61,6 @@ const TestCategory = sequelize.define("test_category", {
 const Answer = sequelize.define("answer", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 	text: { type: DataTypes.STRING },
-	isCorrect: { type: DataTypes.BOOLEAN, defaultValue: true },
 });
 
 const FinalResult = sequelize.define("finalResult", {
@@ -79,7 +80,10 @@ const BasketUserCourse = sequelize.define("basket_user_course", {
 
 const UserAnswer = sequelize.define("user_answer", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	correctAnswers: { type: DataTypes.STRING, allowNull: false },
+	userAnswers: { type: DataTypes.STRING, allowNull: false },
+	questionTitle: { type: DataTypes.STRING, allowNull: false },
+	IsCorect: { type: DataTypes.BOOLEAN, allowNull: false },
+	atemp: {type: DataTypes.INTEGER,  allowNull: false }
 });
 
 const PreRegistration = sequelize.define("pre_registration", {
@@ -128,6 +132,12 @@ FinalResult.belongsTo(User);
 
 User.hasMany(UserAnswer);
 UserAnswer.belongsTo(User);
+
+Test.hasMany(UserAnswer);
+UserAnswer.belongsTo(Test);
+
+Question.hasMany(UserAnswer);
+UserAnswer.belongsTo(Question)
 
 Test.hasMany(Question);
 Question.belongsTo(Test);
