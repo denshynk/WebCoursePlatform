@@ -159,4 +159,5 @@ module.exports = {
 	ThemText,
 	TestCategory,
 	Question,
+	BasketUserCourse,
 };

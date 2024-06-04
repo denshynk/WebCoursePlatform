@@ -1,7 +1,7 @@
 const ApiError = require("../error/ApiError");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User, PreRegistration } = require("../models/models");
+const { User, PreRegistration, UserCourse,  BasketUserCourse } = require("../models/models");
 
 const generateJWT = (id, email, role) => {
 	return jwt.sign({ id, email, role }, process.env.SECRET_KEY_JWT, {
@@ -12,7 +12,6 @@ const generateJWT = (id, email, role) => {
 class UserController {
 	async registration(req, res, next) {
 		let users = req.body;
-		console.log(users);
 		try {
 			const userData = await Promise.all(
 				users.map(async (user) => {
@@ -30,9 +29,6 @@ class UserController {
 				})
 			);
 
-			// Здесь можете добавить проверки на name, surname и group, как вы сделали в вашем коде.
-
-			// Создаем всех пользователей
 			const createdUsers = await Promise.all(
 				userData.map(async (userData) => {
 					const { email, password, name, surname, group, role } = userData;
@@ -43,14 +39,21 @@ class UserController {
 						);
 					}
 
-					return User.create({
+					const newUser = await User.create({
 						email,
-						role, // Установите роль пользователя по умолчанию или сделайте это динамически
+						role,
 						password,
 						name,
 						surname,
 						group,
 					});
+
+					// Создание записи в UserCourse для нового пользователя
+					await UserCourse.create({
+						userId: newUser.id,
+					});
+
+					return newUser;
 				})
 			);
 
@@ -87,7 +90,7 @@ class UserController {
 
 	async check(req, res, next) {
 		const token = generateJWT(req.user.id, req.user.email, req.user.role);
-		const email = req.user.email 
+		const email = req.user.email;
 		const user = await User.findOne({ where: { email } });
 		const dataUser = {
 			email: user.email,
@@ -97,6 +100,29 @@ class UserController {
 			role: user.role,
 		};
 		return res.json({ token, dataUser });
+	}
+
+	async getAllUsers(req, res, next) {
+		try {
+			const users = await User.findAll({
+				attributes: { exclude: ["password", "createdAt", "updatedAt", "role"] },
+				where: { role: "User" },
+				include: [
+					{
+						model: UserCourse,
+						include: [BasketUserCourse], // Вложенный include для получения данных о курсах
+					},
+				],
+			});
+
+			if (!users || users.length === 0) {
+				return res.status(404).json({ message: "Users not found" });
+			}
+
+			res.status(200).json(users);
+		} catch (error) {
+			next(error); // передача ошибки в обработчик ошибок Express
+		}
 	}
 }
 

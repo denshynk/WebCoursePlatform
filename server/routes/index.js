@@ -10,6 +10,7 @@ const userRouter = require("./userRouter");
 const preRegistration = require('./preRegistrationRouter')
 const userAnswer = require('./userAnswerRouter')
 const testcategory = require('./testCategoryRouter')
+const userCourseRouter = require("./userCourseRouter");
 
 
 
@@ -23,6 +24,7 @@ router.use("/userAnswer", userAnswer);
 router.use('/answer', answerRouter)
 router.use('/finalResult', finalResultRouter)
 router.use("/questionCategory", testcategory);
+router.use("/userCourse", userCourseRouter);
 
 
 

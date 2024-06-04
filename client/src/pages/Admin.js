@@ -74,7 +74,7 @@ const Admin = () => {
 						className="mt-2 p-2"
 						onClick={() => setAddCourseToStudentVisable(true)}
 					>
-						Додати групу студентів до курсу
+						Додати студентів до курссів
 					</Button>
 					<AgreeRegistration
 						show={successRegistration}

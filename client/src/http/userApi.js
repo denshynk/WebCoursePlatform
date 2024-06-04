@@ -24,14 +24,26 @@ export const deletePreRegistrationUser = async (users) => {
 };
 
 export const fetchAllPreRegistratio = async () => {
-	const { data } = await $host.get("api/preregistration");
+	const { data } = await $authHost.get("api/preregistration");
+	return data;
+};
+
+export const fetchAllUsers = async () => {
+	const { data } = await $authHost.get("api/user/getAllUsers");
+	return data;
+};
+export const addUserToCours = async (courseUsers) => {
+	const { data } = await $authHost.post(
+		"api/userCourse/addtocourse",
+		courseUsers
+	);
 	return data;
 };
 
 export const login = async (email, password) => {
 	const { data } = await $host.post("api/user/login", {
 		email,
-		password,
+		password
 	});
 	localStorage.setItem("token", data.token);
 	return {
@@ -40,6 +52,8 @@ export const login = async (email, password) => {
 		courses: data.courses,
 	};
 };
+
+
 
 export const check = async () => {
 	const { data } = await $authHost.get('api/user/auth')
