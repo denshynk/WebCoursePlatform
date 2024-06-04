@@ -11,7 +11,7 @@ class UserCoursesController {
 	async addToCourse(req, res, next) {
 		try {
 			const { courseId, usersId } = req.body;
-			console.log();
+			console.log(req.body);
 
 		} catch (error) {
 			next(error);

@@ -26,6 +26,7 @@ const AddCourseToStudent = ({ show, onHide }) => {
 			try {
 				const data = await fetchCourse();
 				setCourses(data);
+				console.log(users.user_course);
 			} catch (error) {
 				console.error("Error fetching courses:", error);
 			}
@@ -39,7 +40,7 @@ const AddCourseToStudent = ({ show, onHide }) => {
 			try {
 				const data = await fetchAllUsers();
 				setUsers(data);
-				console.log(data);
+				
 			} catch (error) {
 				console.error("Error fetching Users:", error);
 			}
@@ -58,6 +59,8 @@ const AddCourseToStudent = ({ show, onHide }) => {
 	};
 
 	const handleUserSelect = (userId) => {
+		users.filter((id) => id === userId).map(user => console.log(user))
+		
 		setSelectedUsers((prevSelected) =>
 			prevSelected.includes(userId)
 				? prevSelected.filter((id) => id !== userId)
