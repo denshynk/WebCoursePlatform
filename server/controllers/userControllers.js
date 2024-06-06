@@ -1,7 +1,12 @@
 const ApiError = require("../error/ApiError");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User, PreRegistration, UserCourse,  BasketUserCourse } = require("../models/models");
+const {
+	User,
+	PreRegistration,
+	UserCourse,
+	BasketUserCourse,
+} = require("../models/models");
 
 const generateJWT = (id, email, role) => {
 	return jwt.sign({ id, email, role }, process.env.SECRET_KEY_JWT, {
@@ -110,7 +115,13 @@ class UserController {
 				include: [
 					{
 						model: UserCourse,
-						include: [BasketUserCourse], // Вложенный include для получения данных о курсах
+						attributes: { exclude: ["createdAt", "updatedAt"] },
+						include: [
+							{
+								model: BasketUserCourse,
+								attributes: { exclude: ["createdAt", "updatedAt","userCourseId"] },
+							},
+						], // Вложенный include для получения данных о курсах
 					},
 				],
 			});

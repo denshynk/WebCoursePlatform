@@ -26,7 +26,6 @@ const AddCourseToStudent = ({ show, onHide }) => {
 			try {
 				const data = await fetchCourse();
 				setCourses(data);
-				console.log(users.user_course);
 			} catch (error) {
 				console.error("Error fetching courses:", error);
 			}
@@ -40,7 +39,7 @@ const AddCourseToStudent = ({ show, onHide }) => {
 			try {
 				const data = await fetchAllUsers();
 				setUsers(data);
-				
+				console.log(data);
 			} catch (error) {
 				console.error("Error fetching Users:", error);
 			}
@@ -89,19 +88,28 @@ const AddCourseToStudent = ({ show, onHide }) => {
 			setSortOrder(order);
 		};
 
-	  const sortedUsers = [...users].sort((a, b) => {
+		const sortedUsers = [...users].sort((a, b) => {
 			if (a[sortColumn] < b[sortColumn]) return sortOrder === "asc" ? -1 : 1;
 			if (a[sortColumn] > b[sortColumn]) return sortOrder === "asc" ? 1 : -1;
 			return 0;
 		});
-
-		const filteredUsers = sortedUsers.filter(
-			(user) =>
+		
+		const filteredUsers = sortedUsers.filter((user) => {
+			// Проверка наличия курса у пользователя
+			const hasSelectedCourse = user.user_course?.basket_user_courses.some(
+				(course) => course.courseId === parseInt(selectedCourseId)
+			);
+		
+			// Фильтрация пользователей
+			const matchesSearchTerm = 
 				user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
 				user.surname.toLowerCase().includes(searchTerm.toLowerCase()) ||
 				user.group.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				user.email.toLowerCase().includes(searchTerm.toLowerCase())
-		);
+				user.email.toLowerCase().includes(searchTerm.toLowerCase());
+		
+			return !hasSelectedCourse && matchesSearchTerm;
+		});
+		
 
 	return (
 		<Modal
@@ -113,7 +121,7 @@ const AddCourseToStudent = ({ show, onHide }) => {
 		>
 			<Modal.Header closeButton>
 				<Modal.Title id="contained-modal-title-vcenter">
-					Створити Курс
+					Додати студентів до курсу
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
@@ -135,7 +143,7 @@ const AddCourseToStudent = ({ show, onHide }) => {
 							))}
 						</Form.Control>
 					</Form.Group>{" "}
-					<Form.Group controlId="formSearch">
+					{selectedCourseId && (<><Form.Group controlId="formSearch">
 						<Form.Label>Search Students</Form.Label>
 						<Form.Control
 							type="text"
@@ -184,7 +192,7 @@ const AddCourseToStudent = ({ show, onHide }) => {
 								</tr>
 							))}
 						</tbody>
-					</Table>
+					</Table></>)}
 				</Form>
 			</Modal.Body>
 			<Modal.Footer>
