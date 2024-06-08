@@ -18,9 +18,8 @@ const CrateThem = ({ show, onHide }) => {
 	const [selectedUsers, setSelectedUsers] = useState([]);
 
 	useEffect(() => {
-		fetchAllPreRegistratio().then((data) => setPreRegistrations(data));
-		
-	}, []);
+		if(show){fetchAllPreRegistratio().then((data) => setPreRegistrations(data));}
+	}, [show]);
 
 	const handleAdd = async () => {
 		try {
@@ -153,10 +152,22 @@ const CrateThem = ({ show, onHide }) => {
 				</Table>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-danger" onClick={() =>{ handleDelete(); onHide()}}>
+				<Button
+					variant="outline-danger"
+					onClick={() => {
+						handleDelete();
+						onHide();
+					}}
+				>
 					Удалить
 				</Button>
-				<Button variant="outline-success" onClick={() => {handleAdd(); onHide()}}>
+				<Button
+					variant="outline-success"
+					onClick={() => {
+						handleAdd();
+						onHide();
+					}}
+				>
 					Добавить
 				</Button>
 			</Modal.Footer>

@@ -37,7 +37,7 @@ const CreateTheme = ({ show, onHide }) => {
 	const [editingTextText, setEditingTextText] = useState("");
 
 	useEffect(() => {
-		const fetchCourses = async () => {
+		if (show){const fetchCourses = async () => {
 			try {
 				const data = await fetchCourse();
 				setCourses(data);
@@ -45,7 +45,7 @@ const CreateTheme = ({ show, onHide }) => {
 				console.error("Error fetching courses:", error);
 			}
 		};
-		if (show) fetchCourses();
+	 fetchCourses();}
 	}, [show]);
 
 	useEffect(() => {
@@ -161,8 +161,6 @@ const CreateTheme = ({ show, onHide }) => {
 				(theme) => theme.id === parseInt(selectedThemeId)
 			);
 			setSelectedThemeTexts(selectedTheme.them_texts);
-
-			console.log(selectedThemeTextes);
 			setEditingText(null);
 			setEditingTextTitle("");
 			setEditingTextText("");

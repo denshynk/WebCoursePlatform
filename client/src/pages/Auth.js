@@ -4,8 +4,6 @@ import Row from "react-bootstrap/Row";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
 	ACOUNT_ROUTE,
-	ALL_COURSES_ROUTE,
-	BASKET_COURSE_ROUTE,
 	LOGIN_ROUTE,
 	REGISTRATION_ROUTE,
 } from "../utils/consts";

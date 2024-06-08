@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { fetchOneCourse } from "../http/courseApi";
+import TestModal from "../components/modals/TestModal";
 
 const Course = () => {
 	const [course, setCourse] = useState({});
@@ -15,32 +16,15 @@ const Course = () => {
 				// Optionally set course to null or empty object if the fetch fails
 				setCourse(null);
 			});
-		console.log(course);
 	}, [id]);
 
 	const [selectedTheme, setSelectedTheme] = useState(null);
 	const [showTest, setShowTest] = useState(false);
-	const [currentQuestion, setCurrentQuestion] = useState(0);
 	const [testAnswers, setTestAnswers] = useState({});
-	const [timeLeft, setTimeLeft] = useState(300);
 	const [testCompleted, setTestCompleted] = useState(false);
+	const [openModal, setOpenModal] = useState(false);
+	const [selectedTest, setSelectedTest] = useState(null);
 
-	useEffect(() => {
-		let timer;
-		if (showTest && timeLeft > 0) {
-			timer = setInterval(() => {
-				setTimeLeft((prevTime) => {
-					if (prevTime <= 1) {
-						clearInterval(timer);
-						handleSubmitTest();
-						return 0;
-					}
-					return prevTime - 1;
-				});
-			}, 1000);
-		}
-		return () => clearInterval(timer);
-	}, [showTest, timeLeft]);
 
 	useEffect(() => {
 		if (testCompleted) {
@@ -55,26 +39,9 @@ const Course = () => {
 	const handleThemeClick = (theme) => {
 		setSelectedTheme(theme);
 		setShowTest(false);
-		setCurrentQuestion(0);
 		setTestCompleted(false);
 		setTestAnswers({});
 		setSelectedParagraph(null);
-	};
-
-	const handleStartTest = () => {
-		setShowTest(true);
-		setTimeLeft(300);
-	};
-
-	const handleNextQuestion = () => {
-		setCurrentQuestion((prevQuestion) => prevQuestion + 1);
-	};
-
-	const handleAnswerChange = (answer) => {
-		setTestAnswers((prevAnswers) => ({
-			...prevAnswers,
-			[currentQuestion]: answer,
-		}));
 	};
 
 	const [selectedParagraph, setSelectedParagraph] = useState(null);
@@ -82,15 +49,6 @@ const Course = () => {
 	const handleParagraphClick = (paragraphId) => {
 		setSelectedParagraph(paragraphId);
 		setSelectedTheme(null);
-	};
-
-	const handleSubmitTest = () => {
-		setShowTest(false);
-		setTestCompleted(true);
-		const completeAnswers = (selectedTheme?.test || []).map(
-			(_, idx) => testAnswers[idx] || ""
-		);
-		console.log(completeAnswers);
 	};
 
 	return (
@@ -166,89 +124,33 @@ const Course = () => {
 										<p>{them_texts.text}</p>
 									</div>
 								))}
-							{selectedTheme &&
-								selectedTheme.test &&
-								!showTest &&
-								!testCompleted && (
-									<div>
-										<h1>{selectedTheme.title}</h1>
-										<p>{selectedTheme.description}</p>
-										{selectedTheme?.text
-											?.sort((a, b) => a.number - b.number)
-											?.map((txt) => (
-												<div key={txt.id}>
-													<h2>{txt.title}</h2>
-													<p>{txt.maintext}</p>
-												</div>
-											))}
-										<Button variant="primary" onClick={handleStartTest}>
-											Пройти тест
-										</Button>
-									</div>
-								)}
-						</div>
-					)}
-					{showTest && currentQuestion < (selectedTheme?.test || []).length && (
-						<div className="mt-3">
-							<h2>Питання {currentQuestion + 1}</h2>
-							<h4 className="mt-3">
-								{selectedTheme?.test[currentQuestion]?.title}
-							</h4>
-							{selectedTheme?.test[currentQuestion]?.choseAnswer?.map(
-								(answer, idx) => (
-									<div key={idx}>
-										<input
-											type="radio"
-											id={`${currentQuestion}-${idx}`}
-											name={`${currentQuestion}`}
-											value={answer}
-											checked={testAnswers[currentQuestion] === answer}
-											onChange={() => handleAnswerChange(answer)}
-										/>
-										<label
-											className="ml-2 mt-3"
-											htmlFor={`${currentQuestion}-${idx}`}
-										>
-											{answer}
-										</label>
-									</div>
-								)
+							{selectedTheme && !showTest && !testCompleted && (
+								<div>
+									{selectedTheme?.tests?.map((test, index) => (
+										<div key={test.id}>
+											<Button
+												className="m-2"
+												variant="primary"
+												onClick={() => {
+													setOpenModal(true);
+													setSelectedTest(test.id);
+												}}
+											>
+												Пройти тест {`${index + 1}`}
+											</Button>
+										</div>
+									))}
+								</div>
 							)}
-							{currentQuestion === selectedTheme.test.length - 1 ? (
-								<Button
-									className="mt-3"
-									variant="primary"
-									onClick={handleSubmitTest}
-								>
-									Завершить тест
-								</Button>
-							) : (
-								<Button
-									className="mt-3"
-									variant="primary"
-									onClick={handleNextQuestion}
-								>
-									Далее
-								</Button>
-							)}
-						</div>
-					)}
-					{showTest && (
-						<div className="mt-3">
-							<h4>
-								Время до конца теста: {Math.floor(timeLeft / 60)}:
-								{timeLeft % 60 < 10 ? `0${timeLeft % 60}` : timeLeft % 60}
-							</h4>
-						</div>
-					)}
-					{testCompleted && (
-						<div>
-							<h2>Тест завершен</h2>
-							<p>Ваши ответы были отправлены.</p>
 						</div>
 					)}
 				</Col>
 			</Row>
+			<TestModal
+				show={openModal}
+				testId={selectedTest}
+				onHide={() => setOpenModal(false)}
+			/>
 		</Container>
 	);
 };

@@ -19,37 +19,38 @@ const CreateParagraph = ({ show, onHide }) => {
 	const [editingText, setEditingText] = useState("");
 
 	useEffect(() => {
-		const fetchCourses = async () => {
-			try {
-				const data = await fetchCourse();
-				setCourses(data);
-			} catch (error) {
-				console.error("Error fetching courses:", error);
-			}
-
-		};
-
 		if (show) {
+			const fetchCourses = async () => {
+				try {
+					const data = await fetchCourse();
+					setCourses(data);
+				} catch (error) {
+					console.error("Error fetching courses:", error);
+				}
+			};
+
 			fetchCourses();
 		}
-	}, [show,]);
+	}, [show]);
 
 	useEffect(() => {
-		const fetchParagraphsForCourse = async () => {
-			try {
-				if (selectedCourseId) {
-					const data = await fetchParagraph(selectedCourseId);
-					setParagraphs(data);
-				} else {
-					setParagraphs([]);
+		if (show) {
+			const fetchParagraphsForCourse = async () => {
+				try {
+					if (selectedCourseId) {
+						const data = await fetchParagraph(selectedCourseId);
+						setParagraphs(data);
+					} else {
+						setParagraphs([]);
+					}
+				} catch (error) {
+					console.error("Error fetching paragraphs:", error);
 				}
-			} catch (error) {
-				console.error("Error fetching paragraphs:", error);
-			}
-		};
+			};
 
-		fetchParagraphsForCourse();
-	}, [selectedCourseId]);
+			fetchParagraphsForCourse();
+		}
+	}, [show, selectedCourseId]);
 
 	const handleCreateParagraph = async () => {
 		try {
@@ -89,7 +90,6 @@ const CreateParagraph = ({ show, onHide }) => {
 
 	const handleDeleteParagraph = async (id) => {
 		try {
-			console.log(id);
 			await deleteParagraph(id);
 
 			setParagraphs(paragraphs.filter((paragraph) => paragraph.id !== id));

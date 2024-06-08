@@ -14,7 +14,6 @@ module.exports = function (req, res, next) {
 		}
 		const decoded = jwt.verify(token, process.env.SECRET_KEY_JWT);
 		req.user = decoded;
-
 		next();
 	} catch (e) {
 		console.error("Ошибка при проверке токена:", e); // Логирование ошибки для отладки

@@ -22,7 +22,7 @@ const AddCourseToStudent = ({ show, onHide }) => {
 	const [selectedCourseId, setSelectedCourseId] = useState("");
 
 	useEffect(() => {
-		const fetchCourses = async () => {
+		if(show){const fetchCourses = async () => {
 			try {
 				const data = await fetchCourse();
 				setCourses(data);
@@ -31,22 +31,22 @@ const AddCourseToStudent = ({ show, onHide }) => {
 			}
 		};
 
-		fetchCourses();
-	}, []);
+		fetchCourses();}
+	}, [show]);
 
 	useEffect(() => {
-		const fetchUsers = async () => {
+		if(show){const fetchUsers = async () => {
 			try {
 				const data = await fetchAllUsers();
 				setUsers(data);
-				console.log(data);
+			
 			} catch (error) {
 				console.error("Error fetching Users:", error);
 			}
 		};
 
-		fetchUsers();
-	}, []);
+		fetchUsers();}
+	}, [show]);
 
 	const handleCourseChange = async (e) => {
 		const courseId = e.target.value;
@@ -57,9 +57,7 @@ const AddCourseToStudent = ({ show, onHide }) => {
 		}
 	};
 
-	const handleUserSelect = (userId) => {
-		users.filter((id) => id === userId).map(user => console.log(user))
-		
+	const handleUserSelect = (userId) => {	
 		setSelectedUsers((prevSelected) =>
 			prevSelected.includes(userId)
 				? prevSelected.filter((id) => id !== userId)
@@ -73,7 +71,6 @@ const AddCourseToStudent = ({ show, onHide }) => {
 				courseId: selectedCourseId,
 				usersId: selectedUsers,
 			};
-			console.log(courseUsers);
 			const data = await addUserToCours(courseUsers);
 			console.log("User successfully add to course", data);
 		} catch (error) {

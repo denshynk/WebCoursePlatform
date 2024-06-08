@@ -7,7 +7,6 @@ import { Context } from "./index";
 import { check } from "./http/userApi";
 import { Spinner } from "react-bootstrap";
 
-
 const App = observer(() => {
 	const { user } = useContext(Context);
 	const [loading, setLoading] = useState(true);
@@ -19,7 +18,6 @@ const App = observer(() => {
 				.then((data) => {
 					user.setUser(data.userData);
 					user.setIsAuth(true);
-				
 				})
 				.catch((err) => {
 					setError(err.message); // сохраняем сообщение об ошибке
@@ -31,11 +29,10 @@ const App = observer(() => {
 
 	if (loading) {
 		return (
-			<Spinner
-				className="d-flex justify-contenc-center align-items-center "
-				animation="border"
-				role="status"
-			/>
+			<div className="d-flex justify-content-center align-items-center " style={{height:'100vh'}}>
+				
+				<Spinner  animation="border" role="status" />
+			</div>
 		);
 	}
 

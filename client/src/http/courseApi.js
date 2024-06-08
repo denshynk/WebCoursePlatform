@@ -6,9 +6,17 @@ export const createCourse = async (course) => {
 };
 
 export const fetchCourse = async () => {
-	const { data } = await $host.get("api/cours/allCourses");
+	const { data } = await $authHost.get("api/cours/allCourses");
 	return data;
 };
+
+
+
+export const fetchMyCourse = async () => {
+	const { data } = await $authHost.get("api/cours/my-courses");
+	return data;
+};
+
 
 export const createParagraph = async (paragraph) => {
 	const { data } = await $authHost.post("api/paragraph/create", paragraph);
@@ -16,9 +24,33 @@ export const createParagraph = async (paragraph) => {
 	return data;
 };
 
+
+
+export const fetchStudentTestResults = async (courseId) => {
+	const { data } = await $authHost.get(
+		"api/userAnswer/courseTest/" + courseId
+	);
+	return data;
+};
+
+export const fetchAllStudentTestResults = async (courseId) => {
+	const { data } = await $authHost.get(
+		"api/userAnswer/courseTest/forAllStudent/" + courseId
+	);
+	return data;
+};
+
+
 export const fetchParagraph = async (courseId) => {
 	const { data } = await $authHost.get(
 		`api/paragraph/coursParagraph/${courseId}`
+	);
+	return data;
+};
+
+export const fetchTestById = async (testId) => {
+	const { data } = await $authHost.get(
+		`api/test/selected/` + testId
 	);
 	return data;
 };
@@ -37,6 +69,12 @@ export const deleteParagraph = async (id) => {
 
 export const createTheme = async (theme) => {
 	const { data } = await $authHost.post("api/theme/create", theme);
+
+	return data;
+};
+
+export const submitTest = async (finalAnswer) => {
+	const { data } = await $authHost.post("api/test/userAnswer", finalAnswer);
 
 	return data;
 };

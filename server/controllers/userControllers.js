@@ -103,6 +103,7 @@ class UserController {
 			surname: user.surname,
 			group: user.group,
 			role: user.role,
+			id:user.id
 		};
 		return res.json({ token, dataUser });
 	}

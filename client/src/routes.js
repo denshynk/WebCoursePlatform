@@ -14,11 +14,12 @@ import AllCourse from "./pages/AllCourse";
 import MyCourses from "./pages/MyCourses";
 import Auth from "./pages/Auth.js";
 import Account from "./pages/Acount.js";
+import AdminRoute from "./components/AdminRoute";
 
 export const authRoutes = [
 	{
 		path: ADMIN_ROUTE,
-		element: <Admin />,
+		element: <AdminRoute element={<Admin />} />, 
 	},
 
 	{

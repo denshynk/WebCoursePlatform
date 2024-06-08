@@ -1,23 +1,49 @@
-import React, { useContext } from "react";
-import { Col, Container, Row, Table, Card } from "react-bootstrap";
+import React, { useContext, useEffect, useState } from "react";
+import {
+	Col,
+	Container,
+	Row,
+	Card,
+	ProgressBar,
+	Button,
+} from "react-bootstrap";
 import { Context } from "../index";
+import { fetchMyCourse } from "../http/courseApi";
+import { useNavigate } from "react-router-dom";
+import { COURSE_ROUTE } from "../utils/consts";
+import StudentCourseInfo from "../components/modals/StudentCourseInfo";
 
 const Account = () => {
 	const { user } = useContext(Context);
-	console.log(user);
-	// Пример данных пользователя, можно удалить, если данные берутся из контекста
-	const userData = {
-		name: user.user.name,
-		email: user.user.email,
-		group: user.user.group,
-		surname: user.user.surname,
+	const [myCourses, setMyCourses] = useState([]);
+	const [infoVisible, setInfoVisible] = useState(false);
+	const [courseId, setCourseId] = useState();
+	const [courseTitle, setCourseTitle] = useState();
+	const navigate = useNavigate();
 
-		courses: [
-			{ id: 1, name: "Course 1", grade: "A" },
-			{ id: 2, name: "Course 2", grade: "B" },
-			{ id: 3, name: "Course 3", grade: "C" },
-		],
-		finalRating: "B+",
+	useEffect(() => {
+		const fetchMyCourses = async () => {
+			try {
+				const data = await fetchMyCourse();
+				setMyCourses(data);
+			} catch (error) {
+				console.error("Error fetching courses:", error);
+			}
+		};
+
+		fetchMyCourses();
+	}, []);
+
+	const getColor = (percentage) => {
+		if (percentage < 30) return "danger";
+		else if (percentage < 60) return "warning";
+		else if (percentage < 90) return "success";
+	};
+
+	const renderProgressBar = (result) => {
+		const percentage = parseFloat(result);
+		const color = getColor(percentage);
+		return <ProgressBar now={percentage} variant={color} />;
 	};
 
 	return (
@@ -28,47 +54,55 @@ const Account = () => {
 						<Card.Body>
 							<Card.Title>Профиль пользователя</Card.Title>
 							<Card.Text>
-								<strong>Група:</strong> {userData.group} <br />
-								<strong>Ім`я:</strong> {userData.name} <br />
-								<strong>Прізвище:</strong> {userData.surname}
+								<strong>Группа:</strong> {user.user.group} <br />
+								<strong>Имя:</strong> {user.user.name} <br />
+								<strong>Фамилия:</strong> {user.user.surname}
 								<br />
-								<strong>Email:</strong> {userData.email}
+								<strong>Email:</strong> {user.user.email}
 								<br />
-								
 							</Card.Text>
 						</Card.Body>
 					</Card>
 				</Col>
 				<Col md={8}>
-					<Card>
-						<Card.Body>
-							<Card.Title>Ваши курсы и оценки</Card.Title>
-							<Table striped bordered hover>
-								<thead>
-									<tr>
-										<th>#</th>
-										<th>Название курса</th>
-										<th>Оценка</th>
-									</tr>
-								</thead>
-								<tbody>
-									{userData.courses.map((course, index) => (
-										<tr key={course.id}>
-											<td>{index + 1}</td>
-											<td>{course.name}</td>
-											<td>{course.grade}</td>
-										</tr>
-									))}
-								</tbody>
-							</Table>
-							<Card.Title>Итоговый рейтинг</Card.Title>
-							<Card.Text>
-								<strong>Рейтинг:</strong> {userData.finalRating}
-							</Card.Text>
-						</Card.Body>
-					</Card>
+					{myCourses.map((course, index) => (
+						<Card
+							key={course.id}
+							style={{ height: "150px", borderRadius: "20px" }}
+							className="m-3 d-flex flex-column cursor-pointer"
+							text="black"
+						>
+							<Card.Body
+								onClick={() => navigate(COURSE_ROUTE + "/" + course.id)}
+							>
+								<Card.Title>{course.title}</Card.Title>
+								<div className="mt-auto">
+									<h1 className="m-0 d-flex justify-content-end">
+										{course.result ?? 0}
+									</h1>
+									{renderProgressBar(course.result ?? 0)}
+								</div>
+							</Card.Body>
+							<Button className='p-0'
+								variant="link"
+								onClick={() => {
+									setInfoVisible(true);
+									setCourseId(course.id);
+									setCourseTitle(course.title)
+								}}
+							>
+								Детальніше
+							</Button>
+						</Card>
+					))}
 				</Col>
 			</Row>
+			<StudentCourseInfo
+					show={infoVisible}
+					onHide={() => setInfoVisible(false)}
+					prevcourseId={courseId}
+					prevcourseTitle={courseTitle}
+				/>
 		</Container>
 	);
 };

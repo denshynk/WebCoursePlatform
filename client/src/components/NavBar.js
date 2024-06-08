@@ -33,20 +33,24 @@ const NavBar = observer(() => {
 				>
 					KPI Web-Course
 				</NavLink>
-				<NavLink
-					style={{ color: "white", textDecoration: "none" }}
-					to={ALL_COURSES_ROUTE}
-				>
-					all-courses
-				</NavLink>
+				{user.user.role === "Admin" && (
+					<NavLink
+						style={{ color: "white", textDecoration: "none" }}
+						to={ALL_COURSES_ROUTE}
+					>
+						all-courses
+					</NavLink>
+				)}
 				{user.isAuth ? (
 					<Nav className="ml-auto" style={{ color: "white" }}>
-						<Button
-							variant={"outline-light"}
-							onClick={() => navigate(ADMIN_ROUTE)}
-						>
-							Адміністратор
-						</Button>
+						{user.user.role === "Admin" && (
+							<Button
+								variant={"outline-light"}
+								onClick={() => navigate(ADMIN_ROUTE)}
+							>
+								Адміністратор
+							</Button>
+						)}
 						<Button
 							variant={"outline-light"}
 							onClick={() => {

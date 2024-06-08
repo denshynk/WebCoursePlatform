@@ -6,6 +6,7 @@ import CreateParagraph from "../components/modals/CreateParagraph";
 import CrateThem from "../components/modals/CrateThem";
 import CreateTest from "../components/modals/CreateTest";
 import AgreeRegistration from "../components/modals/AgreeRegistration";
+import StudentResults from "../components/modals/StudentResults";
 
 const Admin = () => {
 	const [addCourseToStudentVisable, setAddCourseToStudentVisable] =
@@ -15,6 +16,9 @@ const Admin = () => {
 	const [themVisable, setThemVisable] = useState(false);
 	const [testVisable, setTestVisable] = useState(false);
 	const [successRegistration, setSuccessRegistration] = useState(false);
+	const [studentResults, setStudentResults] = useState(false);
+	
+	
 	return (
 		<Container>
 			<Row className="mt-3">
@@ -76,6 +80,17 @@ const Admin = () => {
 					>
 						Додати студентів до курссів
 					</Button>
+					<Button
+						variant={"outline-dark"}
+						className="mt-2 p-2"
+						onClick={() => setStudentResults(true)}
+					>
+						Переглянути результати студентів
+					</Button>
+					<StudentResults
+						show={studentResults}
+						onHide={() => setStudentResults(false)}
+					></StudentResults>
 					<AgreeRegistration
 						show={successRegistration}
 						onHide={() => setSuccessRegistration(false)}

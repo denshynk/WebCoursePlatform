@@ -33,20 +33,20 @@ const CreateTest = ({ show, onHide }) => {
 	]);
 
 	useEffect(() => {
-		const fetchCourses = async () => {
-			try {
-				const data = await fetchCourse();
-				setCourses(data);
-			} catch (error) {
-				console.error("Error fetching courses:", error);
-			}
-		};
+	if(show){	const fetchCourses = async () => {
+		try {
+			const data = await fetchCourse();
+			setCourses(data);
+		} catch (error) {
+			console.error("Error fetching courses:", error);
+		}
+	};
 
-		fetchCourses();
-	}, []);
+	fetchCourses();}
+	}, [show]);
 
 	useEffect(() => {
-		const fetchQuestionCategories = async () => {
+		if(show){const fetchQuestionCategories = async () => {
 			try {
 				const data = await fetchQuestionCategory();
 				setQuestionCategory(data);
@@ -55,8 +55,8 @@ const CreateTest = ({ show, onHide }) => {
 			}
 		};
 
-		fetchQuestionCategories();
-	}, []);
+		fetchQuestionCategories();}
+	}, [show]);
 
 	const handleCourseChange = async (e) => {
 		const courseId = e.target.value;
@@ -157,7 +157,6 @@ const CreateTest = ({ show, onHide }) => {
 					correctAnswer: q.answers[q.correctAnswerIndex],
 				})),
 			};
-			console.log(test);
 			const data = await createTest(test);
 			console.log("Test created successfully:", data);
 			// onHide();

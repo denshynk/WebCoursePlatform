@@ -18,7 +18,6 @@ export const AgreeRegistration = async (users) => {
 
 export const deletePreRegistrationUser = async (users) => {
 	const emails = users.map((user) => user.email);
-	console.log(emails);
 	const { data } = await $authHost.post("api/preregistration/delete", emails);
 	return data;
 };

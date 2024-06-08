@@ -56,6 +56,7 @@ const Question = sequelize.define("questions", {
 const TestCategory = sequelize.define("test_category", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 	CategoryName: { type: DataTypes.STRING },
+	coefficient:{type:DataTypes.FLOAT}
 });
 
 const Answer = sequelize.define("answer", {
@@ -127,11 +128,17 @@ Answer.belongsTo(Question);
 Course.hasMany(FinalResult);
 FinalResult.belongsTo(Course);
 
+Course.hasMany(UserAnswer);
+UserAnswer.belongsTo(Course);
+
 User.hasMany(FinalResult);
 FinalResult.belongsTo(User);
 
 User.hasMany(UserAnswer);
 UserAnswer.belongsTo(User);
+
+Course.hasMany(Test);
+Test.belongsTo(Course);
 
 Test.hasMany(UserAnswer);
 UserAnswer.belongsTo(Test);
