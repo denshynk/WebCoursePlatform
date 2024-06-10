@@ -37,15 +37,17 @@ const CreateTheme = ({ show, onHide }) => {
 	const [editingTextText, setEditingTextText] = useState("");
 
 	useEffect(() => {
-		if (show){const fetchCourses = async () => {
-			try {
-				const data = await fetchCourse();
-				setCourses(data);
-			} catch (error) {
-				console.error("Error fetching courses:", error);
-			}
-		};
-	 fetchCourses();}
+		if (show) {
+			const fetchCourses = async () => {
+				try {
+					const data = await fetchCourse();
+					setCourses(data);
+				} catch (error) {
+					console.error("Error fetching courses:", error);
+				}
+			};
+			fetchCourses();
+		}
 	}, [show]);
 
 	useEffect(() => {
@@ -229,20 +231,20 @@ const CreateTheme = ({ show, onHide }) => {
 		>
 			<Modal.Header closeButton>
 				<Modal.Title id="contained-modal-title-vcenter">
-					Create or Edit Theme
+					Створення або редагування теми{" "}
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<Form>
 					<Form.Group controlId="formCourseSelect">
-						<Form.Label>Select Course</Form.Label>
+						<Form.Label>Виберіть курс</Form.Label>
 						<Form.Control
 							as="select"
 							value={selectedCourseId}
 							onChange={(e) => setSelectedCourseId(e.target.value)}
 						>
 							<option value="" disabled>
-								Select Course
+								Виберіть курс
 							</option>
 							{courses.map((course) => (
 								<option key={course.id} value={course.id}>
@@ -252,14 +254,14 @@ const CreateTheme = ({ show, onHide }) => {
 						</Form.Control>
 					</Form.Group>
 					<Form.Group className="mt-2" controlId="formParagraphSelect">
-						<Form.Label>Select Paragraph</Form.Label>
+						<Form.Label>Виберіть Абзац</Form.Label>
 						<Form.Control
 							as="select"
 							value={selectedParagraphId}
 							onChange={(e) => setSelectedParagraphId(e.target.value)}
 						>
 							<option value="" disabled>
-								Select Paragraph
+								Виберіть Абзац
 							</option>
 							{paragraphs.map((paragraph) => (
 								<option key={paragraph.id} value={paragraph.id}>
@@ -272,7 +274,7 @@ const CreateTheme = ({ show, onHide }) => {
 						<>
 							<Form.Check
 								type="radio"
-								label="Create New Theme"
+								label="Створити нову тему"
 								name="themeOption"
 								id="createNewTheme"
 								className="mt-3"
@@ -285,7 +287,7 @@ const CreateTheme = ({ show, onHide }) => {
 							{themes.length > 0 && (
 								<Form.Check
 									type="radio"
-									label="Edit or Delete Existing Theme"
+									label="Редагувати або видалити існуючу тему"
 									name="themeOption"
 									id="editExistingTheme"
 									className="mt-2"
@@ -309,7 +311,7 @@ const CreateTheme = ({ show, onHide }) => {
 							/>
 
 							<Form.Group controlId="formThemeText" className="mt-3">
-								<Form.Label>Theme Text</Form.Label>
+								<Form.Label>Текст теми</Form.Label>
 								<Form.Control
 									as="textarea"
 									rows={5}
@@ -323,7 +325,7 @@ const CreateTheme = ({ show, onHide }) => {
 							</Form.Group>
 							{texts.length === 0 && (
 								<Button variant="outline-primary" onClick={handleAddText}>
-									Add Text
+									Додати текст
 								</Button>
 							)}
 
@@ -333,7 +335,7 @@ const CreateTheme = ({ show, onHide }) => {
 										controlId={`formTextTitle${index}`}
 										className="mt-3"
 									>
-										<Form.Label>Text Title</Form.Label>
+										<Form.Label>Назва тексту</Form.Label>
 										<Form.Control
 											type="text"
 											placeholder="Enter title"
@@ -349,7 +351,7 @@ const CreateTheme = ({ show, onHide }) => {
 										controlId={`formTextContent${index}`}
 										className="mt-3"
 									>
-										<Form.Label>Text Content</Form.Label>
+										<Form.Label>Текстовий вміст</Form.Label>
 										<Form.Control
 											as="textarea"
 											rows={5}
@@ -373,7 +375,7 @@ const CreateTheme = ({ show, onHide }) => {
 												variant="outline-danger"
 												onClick={() => handleRemoveText(index)}
 											>
-												Remove Text
+												Видалити текст
 											</Button>
 										)}
 										{index === texts.length - 1 && (
@@ -382,7 +384,7 @@ const CreateTheme = ({ show, onHide }) => {
 												variant="outline-primary"
 												onClick={handleAddText}
 											>
-												Add Text
+												Додати текст
 											</Button>
 										)}
 									</Modal.Footer>
@@ -394,14 +396,14 @@ const CreateTheme = ({ show, onHide }) => {
 					{isEditingTheme && (
 						<>
 							<Form.Group controlId="formThemeSelect" className="mt-3">
-								<Form.Label>Select Theme</Form.Label>
+								<Form.Label>Виберіть тему</Form.Label>
 								<Form.Control
 									as="select"
 									value={selectedThemeId}
 									onChange={handleThemeSelect}
 								>
 									<option value="" disabled>
-										Select Theme
+										Виберіть тему
 									</option>
 									{themes.map((theme) => (
 										<option key={theme.id} value={theme.id}>
@@ -579,23 +581,23 @@ const CreateTheme = ({ show, onHide }) => {
 						onHide();
 					}}
 				>
-					Close
+					Закрити
 				</Button>
 				{isCreatingNewTheme ? (
 					<Button variant="outline-success" onClick={handleCreateTheme}>
-						Add
+						додати
 					</Button>
 				) : (
 					<>
 						<Button variant="outline-danger" onClick={handleDeleteTheme}>
-							Delete
+							Видалити
 						</Button>
 						<Button
 							className="mt-2"
 							variant="outline-primary"
 							onClick={handleAddCurentText}
 						>
-							Add Text
+							Додати текст
 						</Button>
 					</>
 				)}

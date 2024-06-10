@@ -8,15 +8,15 @@ module.exports = function (req, res, next) {
 	try {
 		const authHeader = req.headers.authorization;
 		const token = authHeader.split(" ")[1]; // Bearer
-		// Проверка на наличие токена после разбиения строки
+		// Перевірка на наявність токена після розбиття рядка
 		if (token === "null") {
-			// return res.status(401).json({ message: "Не авторизован" });
+			return res.status(401).json({ message: "Не авторизован" });
 		}
 		const decoded = jwt.verify(token, process.env.SECRET_KEY_JWT);
 		req.user = decoded;
 		next();
 	} catch (e) {
-		console.error("Ошибка при проверке токена:", e); // Логирование ошибки для отладки
-		return res.status(401).json({ message: "Ошибка при проверке токена" });
+		console.error("Помилка під час перевірки токена:", e); // Логування помилки для налагодження
+		return res.status(401).json({ message: "Помилка під час перевірки токена" });
 	}
 };

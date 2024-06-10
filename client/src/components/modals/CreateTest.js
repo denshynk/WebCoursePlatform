@@ -18,7 +18,6 @@ const CreateTest = ({ show, onHide }) => {
 	const [selectedThemeId, setSelectedThemeId] = useState("");
 	const [selectedParagraphId, setSelectedParagraphId] = useState("");
 
-
 	const [testAtemps, setTestAtemps] = useState("");
 	const [testTime, setTestTime] = useState("");
 	const [testTitle, setTestTitle] = useState("");
@@ -33,29 +32,33 @@ const CreateTest = ({ show, onHide }) => {
 	]);
 
 	useEffect(() => {
-	if(show){	const fetchCourses = async () => {
-		try {
-			const data = await fetchCourse();
-			setCourses(data);
-		} catch (error) {
-			console.error("Error fetching courses:", error);
-		}
-	};
+		if (show) {
+			const fetchCourses = async () => {
+				try {
+					const data = await fetchCourse();
+					setCourses(data);
+				} catch (error) {
+					console.error("Error fetching courses:", error);
+				}
+			};
 
-	fetchCourses();}
+			fetchCourses();
+		}
 	}, [show]);
 
 	useEffect(() => {
-		if(show){const fetchQuestionCategories = async () => {
-			try {
-				const data = await fetchQuestionCategory();
-				setQuestionCategory(data);
-			} catch (error) {
-				console.error("Error fetching test categories:", error);
-			}
-		};
+		if (show) {
+			const fetchQuestionCategories = async () => {
+				try {
+					const data = await fetchQuestionCategory();
+					setQuestionCategory(data);
+				} catch (error) {
+					console.error("Error fetching test categories:", error);
+				}
+			};
 
-		fetchQuestionCategories();}
+			fetchQuestionCategories();
+		}
 	}, [show]);
 
 	const handleCourseChange = async (e) => {
@@ -64,8 +67,8 @@ const CreateTest = ({ show, onHide }) => {
 		try {
 			const data = await fetchParagraph(courseId);
 			setParagraphs(data);
-			setSelectedParagraphId(""); // Reset paragraph selection when course changes
-			setThemes([]); // Reset themes when course changes
+			setSelectedParagraphId(""); // Скидання виділення абзацу при зміні курсу
+			setThemes([]); // Скидання тем при зміні курсу
 		} catch (error) {
 			console.error("Error fetching paragraphs:", error);
 		}
@@ -152,6 +155,7 @@ const CreateTest = ({ show, onHide }) => {
 				atemps: testAtemps,
 				time: testTime,
 				themeId: selectedThemeId,
+				courseId: selectedCourseId,
 				questions: questions.map((q) => ({
 					...q,
 					correctAnswer: q.answers[q.correctAnswerIndex],
@@ -159,7 +163,7 @@ const CreateTest = ({ show, onHide }) => {
 			};
 			const data = await createTest(test);
 			console.log("Test created successfully:", data);
-			// onHide();
+			onHide();
 		} catch (error) {
 			console.error("Error creating test:", error);
 		}
@@ -175,20 +179,20 @@ const CreateTest = ({ show, onHide }) => {
 		>
 			<Modal.Header closeButton>
 				<Modal.Title id="contained-modal-title-vcenter">
-					Create Test
+					Створити тест
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<Form>
 					<Form.Group controlId="formCourseSelect">
-						<Form.Label>Select Course</Form.Label>
+						<Form.Label>Виберіть курс</Form.Label>
 						<Form.Control
 							as="select"
 							value={selectedCourseId}
 							onChange={handleCourseChange}
 						>
 							<option value="" disabled>
-								Select Course
+								Виберіть курс
 							</option>
 							{courses.map((course) => (
 								<option key={course.id} value={course.id}>
@@ -198,14 +202,14 @@ const CreateTest = ({ show, onHide }) => {
 						</Form.Control>
 					</Form.Group>
 					<Form.Group className="mt-2" controlId="formParagraphSelect">
-						<Form.Label>Select Paragraph</Form.Label>
+						<Form.Label>Виберіть Абзац</Form.Label>
 						<Form.Control
 							as="select"
 							value={selectedParagraphId}
 							onChange={handleParagraphChange}
 						>
 							<option value="" disabled>
-								Select Paragraph
+								Виберіть Абзац
 							</option>
 							{paragraphs.map((paragraph) => (
 								<option key={paragraph.id} value={paragraph.id}>
@@ -215,14 +219,14 @@ const CreateTest = ({ show, onHide }) => {
 						</Form.Control>
 					</Form.Group>
 					<Form.Group className="mt-2" controlId="formThemeSelect">
-						<Form.Label>Select Theme</Form.Label>
+						<Form.Label>Виберіть тему</Form.Label>
 						<Form.Control
 							as="select"
 							value={selectedThemeId}
 							onChange={(e) => setSelectedThemeId(e.target.value)}
 						>
 							<option value="" disabled>
-								Select Theme
+								Виберіть тему
 							</option>
 							{themes.map((theme) => (
 								<option key={theme.id} value={theme.id}>
@@ -232,7 +236,7 @@ const CreateTest = ({ show, onHide }) => {
 						</Form.Control>
 					</Form.Group>
 
-					<Form.Label className="mt-2">Test Title</Form.Label>
+					<Form.Label className="mt-2">Назва тесту</Form.Label>
 					<Form.Control
 						placeholder="Test Title"
 						value={testTitle}
@@ -256,7 +260,7 @@ const CreateTest = ({ show, onHide }) => {
 					/>
 					{questions.map((question, qIndex) => (
 						<div key={qIndex} className="mt-4">
-							<Form.Label>Question {qIndex + 1}</Form.Label>
+							<Form.Label>Питання {qIndex + 1}</Form.Label>
 
 							<div className="d-flex align-items-center">
 								<Form.Control
@@ -274,14 +278,14 @@ const CreateTest = ({ show, onHide }) => {
 								</Button>
 							</div>
 							<Form.Group className="mt-2" controlId="formCategorySelect">
-								<Form.Label>Select Category</Form.Label>
+								<Form.Label>Виберіть категорію</Form.Label>
 								<Form.Control
 									as="select"
 									value={question.categoryId}
 									onChange={(e) => handleCategoryChange(qIndex, e.target.value)}
 								>
 									<option value="" disabled>
-										Select Category
+										Виберіть категорію
 									</option>
 									{questionCategory.map((category) => (
 										<option key={category.id} value={category.id}>
@@ -291,14 +295,14 @@ const CreateTest = ({ show, onHide }) => {
 								</Form.Control>
 							</Form.Group>
 							<Form.Group>
-								<Form.Label className="mt-2">Answers</Form.Label>
+								<Form.Label className="mt-2">Відповіді</Form.Label>
 								{question.answers.map((answer, aIndex) => (
 									<div key={aIndex} className="d-flex align-items-center mt-2">
 										<Form.Check
 											type="radio"
-											name={`answerOption${qIndex}`} // Уникальное имя для каждой группы радио-кнопок
-											id={`answer-${qIndex}-${aIndex}`} // Уникальный id для каждой радио-кнопки
-											checked={question.correctAnswerIndex === aIndex} // Проверяем, выбран ли текущий ответ
+											name={`answerOption${qIndex}`} // Унікальне ім'я для кожної групи радіокнопок
+											id={`answer-${qIndex}-${aIndex}`} // Унікальний ID для кожної радіо-кнопки
+											checked={question.correctAnswerIndex === aIndex} // Перевіряємо, чи вибрано поточну відповідь
 											onChange={() => handleCorrectAnswerChange(qIndex, aIndex)}
 										/>
 										<Form.Control
@@ -326,7 +330,7 @@ const CreateTest = ({ show, onHide }) => {
 										onClick={() => handleAddAnswer(qIndex)}
 										className="mt-2"
 									>
-										+ Add Answer
+										+ Додати відповідь
 									</Button>
 								)}
 							</Form.Group>
@@ -337,16 +341,16 @@ const CreateTest = ({ show, onHide }) => {
 						onClick={handleAddQuestion}
 						className="mt-4"
 					>
-						+ Add Question
+						+ Додати запитання
 					</Button>
 				</Form>
 			</Modal.Body>
 			<Modal.Footer>
 				<Button variant="outline-danger" onClick={onHide}>
-					Close
+					Закрити
 				</Button>
 				<Button variant="outline-success" onClick={handleCreateTest}>
-					Add
+					Додати
 				</Button>
 			</Modal.Footer>
 		</Modal>

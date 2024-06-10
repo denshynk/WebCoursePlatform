@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(fileUpload({}));
 app.use("/api", router);
 
-//Обработка ошибок
+//Обробка помилок
 app.use(errorHandler);
 
 const start = async () => {
@@ -29,3 +29,5 @@ const start = async () => {
 };
 
 start();
+
+module.exports = app;

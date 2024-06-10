@@ -10,9 +10,9 @@ class UserCoursesController {
 		const { courseId, usersId } = req.body;
 try {
     const users = await Promise.all(
-        usersId.map(async (basketuserId) => {
+        usersId.map(async (oneUserId) => {
             const userCourse = await UserCourse.findOne({
-                where: { userId: basketuserId },
+                where: { userId: oneUserId },
                 include: [
                     {
                         model: BasketUserCourse,
@@ -22,22 +22,24 @@ try {
                 attributes: { exclude: ["createdAt", "updatedAt"] },
             });
 
-             // Проверка, если userCourse или basket_user_courses отсутствует
+             // Перевірка, якщо userCourse або basket_user_courses відсутня
 			 if (!userCourse || !userCourse.basket_user_courses) {
-                throw new Error(`UserCourse или BasketUserCourse не найдены для пользователя с ID ${basketuserId}`);
+                throw new Error(
+									`UserCourse або BasketUserCourse не знайдено для користувача з ID ${oneUserId}`
+								);
             }
 
             // Проверка на наличие курса у студента
             const courses = userCourse.basket_user_courses.map(course => course.dataValues);
             const courseExists = courses.some((course) => course.courseId === parseInt(courseId));
 			if (courseExists) {
-                // Если курс уже есть, вернуть сообщение
-                const user = await User.findOne({ where: { id: usersId } }); // Предполагаем, что есть модель User для получения имени и фамилии студента
-                const errorMessage = `Студент ${user.name} ${user.surname} уже добавлен к курсу.`;
+                // Якщо курс є, повернути повідомлення
+                const user = await User.findOne({ where: { id: usersId } }); // Припускаємо, що є модель User для отримання імені та прізвища студента
+                const errorMessage = `Студента ${user.name} ${user.surname} вже додано до курсу.`;
                 throw new Error(errorMessage);
             }
 
-            // Если курса нет, добавляем новый
+            // Якщо курсу немає, додаємо новий
             await BasketUserCourse.create({
                 userCourseId: userCourse.id,
                 courseId: courseId
@@ -46,9 +48,9 @@ try {
             return userCourse;
         })
     );
-    res.status(200).json({ message: "Курсы успешно добавлены", users });
+    res.status(200).json({ message: "Курси успішно додані", users });
 } catch (error) {
-    // Обработка ошибки и вывод сообщения
+    // Обробка помилки та виведення повідомлення
     res.status(400).json({ error: error.message });
 }
 	}

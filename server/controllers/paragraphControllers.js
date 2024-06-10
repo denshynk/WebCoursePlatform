@@ -38,7 +38,7 @@ class ParagraphController {
 		try {
 			const { paragraphId } = req.params;
 
-			// Delete the paragraph and its associated data
+			// Видаліть абзац і пов’язані з ним дані
 			const deletedCount = await Paragraph.destroy({
 				where: { id: paragraphId },
 				include: [

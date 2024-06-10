@@ -64,12 +64,12 @@ const StudentResults = ({ show, onHide }) => {
 	});
 
 	const filteredUsers = sortedUsers.filter((user) => {
-		// Проверка наличия курса у пользователя
+		// Перевірка наявності курсу користувача
 		const hasSelectedCourse = user.user_course?.basket_user_courses.some(
 			(course) => course.courseId === parseInt(selectedCourseId)
 		);
 
-		// Фильтрация пользователей
+		// Фільтрування користувачів
 		const matchesSearchTerm =
 			user.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
 			user.studentSurname.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -95,14 +95,14 @@ const StudentResults = ({ show, onHide }) => {
 			<Modal.Body>
 				<Form>
 					<Form.Group controlId="formCourseSelect">
-						<Form.Label>Select Course</Form.Label>
+						<Form.Label>Виберіть курс</Form.Label>
 						<Form.Control
 							as="select"
 							value={selectedCourseId}
 							onChange={handleCourseChange}
 						>
 							<option value="" disabled>
-								Select Course
+								Виберіть курс
 							</option>
 							{courses.map((course) => (
 								<option key={course.id} value={course.id}>
@@ -114,7 +114,7 @@ const StudentResults = ({ show, onHide }) => {
 					{selectedCourseId && (
 						<>
 							<Form.Group controlId="formSearch">
-								<Form.Label>Search Students</Form.Label>
+								<Form.Label>Пошук учнів</Form.Label>
 								<Form.Control
 									type="text"
 									placeholder="Search by name, surname, group, or email"
@@ -126,7 +126,7 @@ const StudentResults = ({ show, onHide }) => {
 								<thead>
 									<tr>
 										<th onClick={() => handleSort("name")}>
-											Імя{" "}
+											Ім'я{" "}
 											{sortColumn === "name" &&
 												(sortOrder === "asc" ? "↑" : "↓")}
 										</th>

@@ -7,13 +7,23 @@ const CourseIten = ({ course }) => {
 	const navigate = useNavigate();
 
 	return (
-		<Col md={3} className="mt-4" onClick={() => navigate(COURSE_ROUTE + '/' + course.id)}> 
-			<Card style={{ width: 150, cursor: "pointer" }} border="light">
-        <Image width={150} height={150} src={course.img} />
-        <div className="text-black-50">
-          <div >Веб Програмування</div>
-        </div>
-        <div>{course.title}</div>
+		<Col
+			md={3}
+			className="mt-4 "
+			onClick={() => navigate(COURSE_ROUTE + "/" + course.id)}
+		>
+			<Card
+				className="p-2"
+				style={{ backgroundColor: "black", cursor: "pointer" }}
+				border="light"
+			>
+				<div className="text-black-100"></div>
+				<div
+					className="mt-2"
+					style={{ color:'#fafafa' }}
+				>
+					{course.title}
+				</div>
 			</Card>
 		</Col>
 	);

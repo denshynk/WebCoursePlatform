@@ -38,7 +38,7 @@ const NavBar = observer(() => {
 						style={{ color: "white", textDecoration: "none" }}
 						to={ALL_COURSES_ROUTE}
 					>
-						all-courses
+						All-courses
 					</NavLink>
 				)}
 				{user.isAuth ? (

@@ -113,9 +113,9 @@ const Auth = observer(() => {
 												onChange={(e) => setGroupPrefix(e.target.value)}
 											>
 												<option value="ІС">ІС</option>
-												<option value="КН">КН</option>
-												<option value="ПМ">ПМ</option>
-												{/* Добавьте другие префиксы групп по мере необходимости */}
+												<option value="КН">ІП</option>
+												<option value="ПМ">ІТ</option>
+			
 											</Form.Select>
 										</Col>
 										<Col md={8}>

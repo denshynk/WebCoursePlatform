@@ -52,13 +52,13 @@ const Account = () => {
 				<Col md={4}>
 					<Card>
 						<Card.Body>
-							<Card.Title>Профиль пользователя</Card.Title>
+							<Card.Title>Профіль користувача</Card.Title>
 							<Card.Text>
-								<strong>Группа:</strong> {user.user.group} <br />
-								<strong>Имя:</strong> {user.user.name} <br />
-								<strong>Фамилия:</strong> {user.user.surname}
+								<strong>Група:</strong> {user.user.group} <br />
+								<strong>Ім'я:</strong> {user.user.name} <br />
+								<strong>Прізвище:</strong> {user.user.surname}
 								<br />
-								<strong>Email:</strong> {user.user.email}
+								<strong>Електронна пошта:</strong> {user.user.email}
 								<br />
 							</Card.Text>
 						</Card.Body>

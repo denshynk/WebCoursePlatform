@@ -12,20 +12,21 @@ const ApiError = require("../error/ApiError");
 class TestController {
 	async create(req, res, next) {
 		try {
-			const { title, themeId, time, atemps, questions } = req.body;
-			// Создание теста
+			const { title, themeId, time, atemps, questions, courseId } = req.body;
+			// Створення тесту
 			const test = await Test.create({
 				title,
 				themeId,
 				atemps,
 				time,
+				courseId
 			});
 
-			// Создание вопросов и ответов
+			// Створення питань та відповідей
 			for (const questionData of questions) {
 				const { question, answers, correctAnswer, categoryId } = questionData;
 
-				// Создание вопроса
+				// Створення питання
 				const newQuestion = await Question.create({
 					title: question,
 					choseAnswer: answers,
@@ -64,7 +65,7 @@ class TestController {
 	async getOne(req, res, next) {
 		const { testId } = req.params;
 		try {
-			// Получить тест с вопросами
+			// Отримати тест із запитаннями
 			const test = await Test.findOne({
 				where: { id: testId },
 				attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -76,19 +77,19 @@ class TestController {
 				],
 			});
 
-			// Получить количество попыток пользователя для данного теста
+			// Отримати кількість спроб користувача для цього тесту
 			const userAtemps = await UserAnswer.findAll({
 				where: { userId: req.user.id, testId: testId },
 				attributes: ["atemp"],
 			});
 
-			// Найти наибольшее количество попыток пользователя для этого теста
+			// Знайти найбільшу кількість спроб користувача для цього тесту
 			const hiestAtemp =
 				userAtemps.length > 0
 					? Math.max(...userAtemps.map((ans) => ans.atemp))
 					: 0;
 
-			// Добавить количество попыток в ответ
+			// Додати кількість спроб у відповідь
 			return res.json({ test, curentAtemps: hiestAtemp });
 		} catch (e) {
 			next(ApiError.badRequest(e.message));
@@ -100,7 +101,7 @@ class TestController {
 		const { id } = req.user;
 
 		try {
-			// Получить все правильные ответы из таблицы Answer на основе question IDs
+			// Отримати усі правильні відповіді з таблиці Answer на основі question IDs
 			const correctAnswers = await Answer.findAll({
 				attributes: ["questionId", "text"],
 				where: {
@@ -108,7 +109,7 @@ class TestController {
 				},
 			});
 
-			// Получить информацию о вопросах
+			// Отримати інформацію про питання
 			const questionIdTitle = await Question.findAll({
 				attributes: ["testId", "title", "id", "testCategoryId"],
 				where: {
@@ -116,7 +117,7 @@ class TestController {
 				},
 			});
 
-			// Получить количество попыток для теста
+			// Отримати кількість спроб для тесту
 			const testAtemps = (
 				await Test.findOne({
 					attributes: ["atemps"],
@@ -145,13 +146,13 @@ class TestController {
 				})
 			).theme.paragraph.courseId;
 
-			// Получить количество попыток пользователя для данного теста
+			// Отримати кількість спроб користувача для цього тесту
 			const userAtemps = await UserAnswer.findAll({
 				where: { userId: req.user.id, testId: questionIdTitle[0].testId },
 				attributes: ["atemp"],
 			});
 
-			// Обработка ответов пользователя
+			// Обробка відповідей користувача
 			const userAnswers = await Promise.all(
 				Object.keys(answers).map(async (questionId) => {
 					const userAnswer = answers[questionId];
@@ -162,7 +163,7 @@ class TestController {
 						(q) => q.id == questionId
 					).title;
 
-					// Проверка существующего ответа пользователя
+					// Перевірка існуючої відповіді користувача
 					const existingAnswer = await UserAnswer.findOne({
 						where: {
 							userId: id,
@@ -171,13 +172,13 @@ class TestController {
 					});
 
 					if (existingAnswer) {
-						// Если ответ существует, проверяем количество попыток
+						// Якщо відповідь існує, перевіряємо кількість спроб
 						if (existingAnswer.atemp >= testAtemps) {
 							return {
 								error: `Ви досягли максимальної кількості спроб для питання ${questionTitle}`,
 							};
 						} else {
-							// Обновляем существующий ответ, увеличивая количество попыток на 1
+							// Оновлюємо існуючу відповідь, збільшуючи кількість спроб на 1
 							await existingAnswer.update({
 								userAnswers: userAnswer,
 								IsCorect: userAnswer === correctAnswer,
@@ -189,7 +190,7 @@ class TestController {
 							};
 						}
 					} else {
-						// Создаем новый ответ с atemp: 1
+						// Створюємо нову відповідь з atemp: 1
 						await UserAnswer.create({
 							userAnswers: userAnswer,
 							questionTitle: questionTitle,
@@ -208,23 +209,24 @@ class TestController {
 				})
 			);
 
-			// Проверка на наличие ошибок
+			// Перевірка на наявність помилок
 			const errors = userAnswers.filter((answer) => answer.error);
 			if (errors.length > 0) {
 				return res.status(400).json({ errors });
 			}
 
-			// Получить коэффициенты для категорий
+			// Отримати коефіцієнти для категорій
 			const categoryCoefficients = await TestCategory.findAll({
 				attributes: ["id", "coefficient"],
 			});
-			// Вычисление рейтинга
+			// Обчислення рейтингу
 			let totalScore = 0;
 			let maxScore = 0;
 			const tests = await Test.findAll({
 				where: { courseId: courseId },
 				include: [{ model: Question, attributes: ["id", "testCategoryId"] }],
 			});
+
 
 			const allQuestions = [];
 			tests.forEach((test) => {
@@ -243,6 +245,7 @@ class TestController {
 					);
 					if (question) {
 						const testCategoryId = question.testCategoryId;
+
 						const koefic = categoryCoefficients.find(
 							(koef) => koef.id === testCategoryId
 						);
@@ -260,11 +263,15 @@ class TestController {
 				);
 				if (koefic) {
 					maxScore += koefic.coefficient;
+					
 				}
 			});
+			console.log(totalScore);
+			console.log(maxScore);
 
 			const rating = (totalScore / maxScore) * 100;
-			// Обновить или создать запись в таблице FinalResult
+
+			// Оновити або створити запис у таблиці FinalResult
 			const [userCourseResult, created] = await FinalResult.findOrCreate({
 				where: {
 					userId: id,

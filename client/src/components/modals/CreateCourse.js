@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
-import { createCourse } from "../../http/courseApi"; // Make sure the path is correct
+import { createCourse } from "../../http/courseApi"; // Переконайтеся, що шлях правильний
 
 const CreateCourse = ({ show, onHide }) => {
 	const [courseName, setCourseName] = useState("");
@@ -10,11 +10,11 @@ const CreateCourse = ({ show, onHide }) => {
 			const course = { title: courseName };
 			const data = await createCourse(course);
 			console.log("Course created successfully:", data);
-			// You can add more logic here if needed, such as showing a success message or clearing the form
+			// За потреби тут можна додати більше логіки, наприклад показати повідомлення про успіх або очистити форму
 			onHide();
 		} catch (error) {
 			console.error("Error creating course:", error);
-			// Handle error appropriately, e.g., show an error message to the user
+			// Обробляйте помилку належним чином, наприклад, показуйте користувачеві повідомлення про помилку
 		}
 	};
 

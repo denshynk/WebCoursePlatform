@@ -23,7 +23,7 @@ class CoursController {
 	}
 	async getAllMyCourses(req, res) {
 		try {
-			const userId = req.user.id; // Предполагаем, что ID пользователя доступен в req.user.id
+			const userId = req.user.id; // Припускаємо, що ID користувача доступний у req.user.id
 	
 			const userCourses = await UserCourse.findAll({
 				where: { userId: userId },
@@ -33,7 +33,7 @@ class CoursController {
 						attributes: { exclude: ["createdAt", "updatedAt"] },
 						include: [
 							{
-								model: Course, // Предполагаем, что модель Course связана с UserCourse
+								model: Course, // Припускаємо, що модель Course пов'язана з UserCourse
 								attributes: { exclude: ["createdAt", "updatedAt"] },
 							},
 						],
@@ -42,12 +42,12 @@ class CoursController {
 				attributes: { exclude: ["createdAt", "updatedAt"] },
 			});
 	
-			// Получение списка курсов
+			// Отримання списку курсів
 			const courses = userCourses.flatMap((userCourse) =>
 				userCourse.basket_user_courses.map((basketUserCourse) => basketUserCourse.course)
 			);
 	
-			// Получение результатов для курсов
+			// Отримання результатів для курсів
 			const courseIds = courses.map(course => course.id);
 			const finalResults = await FinalResult.findAll({
 				where: {
@@ -57,13 +57,13 @@ class CoursController {
 				attributes: { exclude: ["createdAt", "updatedAt"] },
 			});
 	
-			// Создание словаря для быстрого доступа к результатам
+			// Створення словника для швидкого доступу до результатів
 			const finalResultsMap = finalResults.reduce((acc, result) => {
 				acc[result.courseId] = result.result;
 				return acc;
 			}, {});
 	
-			// Формирование ответа
+			// Формування відповіді
 			const newCourses = courses.map((course) => ({
 				id: course.id,
 				title: course.title,
@@ -97,7 +97,7 @@ class CoursController {
 									attributes: { exclude: ["createdAt", "updatedAt"] },
 								},
 								{
-									model: ThemText, // Включаем модель ThemText
+									model: ThemText, // Включаємо модель ThemText
 									attributes: { exclude: ["createdAt", "updatedAt"] },
 								},
 							],

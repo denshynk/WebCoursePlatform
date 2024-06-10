@@ -56,7 +56,7 @@ const Course = () => {
 			<h1>{course?.title}</h1>
 			<Row className="mt-5">
 				<Col md={4}>
-					<h2>Материал курса</h2>
+					<h2>Матеріал курсу</h2>
 					{course?.paragraphs
 						?.sort((a, b) => a.id - b.id)
 						?.map((par) => (
@@ -115,7 +115,6 @@ const Course = () => {
 										<p>{txt.maintext}</p>
 									</div>
 								))}
-							{/* Дополнительные тексты */}
 							{selectedTheme?.them_texts
 								?.sort((a, b) => a.number - b.number)
 								?.map((them_texts) => (

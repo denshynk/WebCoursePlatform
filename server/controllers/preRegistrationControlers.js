@@ -15,7 +15,7 @@ class PreRegistrationControler {
 			return next(ApiError.badRequest("Некоректный email или password"));
 		}
 		if (!name) {
-			return next(ApiError.badRequest("Некоректный Імя"));
+			return next(ApiError.badRequest("Некоректне Ім'я"));
 		}
 		if (!surname) {
 			return next(ApiError.badRequest("Некоректный Прізвище"));
@@ -23,7 +23,7 @@ class PreRegistrationControler {
 		const candidate = await PreRegistration.findOne({ where: { email } });
 		if (candidate) {
 			return next(
-				ApiError.badRequest("Пользоваетель с такми email уже существует")
+				ApiError.badRequest("Користувач із таким email вже існує")
 			);
 		}
 		const hashPassword = await bcrypt.hash(password, 5);
@@ -45,7 +45,7 @@ class PreRegistrationControler {
 			return res.json(preUsers);
 		} catch (error) {
 			return next(
-				ApiError.internal("Ошибка при получении данных пользователей")
+				ApiError.internal("Помилка при отриманні даних користувачів")
 			);
 		}
 	}
@@ -73,19 +73,19 @@ class PreRegistrationControler {
 
 			if (successfulDeletes.length === 0) {
 				return next(
-					ApiError.notFound("Пользователи с указанными email не найдены")
+					ApiError.notFound("Користувачі із зазначеними email не знайдені")
 				);
 			}
 
-			let message = `Успешно удалено ${successfulDeletes.length} пользователей.`;
+			let message = `Успішно видалено ${successfulDeletes.length} користувачів.`;
 			if (failedDeletes.length > 0) {
-				message += ` Не удалось найти и удалить ${failedDeletes.length} пользователей.`;
+				message += ` Не вдалося знайти та видалити ${failedDeletes.length} користувачів.`;
 			}
 
 			return res.json({ message });
 		} catch (error) {
 			return next(
-				ApiError.internal("Ошибка при удалении пользователей по email")
+				ApiError.internal("Помилка при видаленні користувачів по email")
 			);
 		}
 	}

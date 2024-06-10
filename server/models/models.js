@@ -9,7 +9,7 @@ const User = sequelize.define("user", {
 	password: { type: DataTypes.STRING },
 	group: { type: DataTypes.STRING, allowNull: true },
 	role: { type: DataTypes.ENUM("User", "Admin"), defaultValue: "User" },
-	// User role can be either 'User' or 'Admin'
+	// Роль користувача може бути "Користувач" або "Адміністратор"
 });
 
 const Course = sequelize.define("course", {
@@ -21,14 +21,14 @@ const Paragraph = sequelize.define("paragraph", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 	title: { type: DataTypes.STRING, unique: false },
 	text: { type: DataTypes.TEXT, unique: false },
-	courseId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Course
+	courseId: { type: DataTypes.INTEGER, allowNull: false }, // Курс посилання на зовнішній ключ
 });
 
 const Theme = sequelize.define("theme", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 	title: { type: DataTypes.STRING },
 	description: { type: DataTypes.TEXT },
-	paragraphId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Paragraph
+	paragraphId: { type: DataTypes.INTEGER, allowNull: false }, // Параграф із посиланням на зовнішній ключ
 	img: { type: DataTypes.STRING },
 });
 
@@ -44,7 +44,7 @@ const Test = sequelize.define("test", {
 	title: { type: DataTypes.STRING, allowNull: false },
 	time: { type: DataTypes.INTEGER, allowNull: false },
 	atemps: { type: DataTypes.INTEGER, allowNull: false },
-	themeId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Theme
+	themeId: { type: DataTypes.INTEGER, allowNull: false }, // Тема посилання на зовнішній ключ
 });
 
 const Question = sequelize.define("questions", {
@@ -66,9 +66,9 @@ const Answer = sequelize.define("answer", {
 
 const FinalResult = sequelize.define("finalResult", {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	userId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing User
-	courseId: { type: DataTypes.INTEGER, allowNull: false }, // Foreign key referencing Course
-	result: { type: DataTypes.STRING }, // Example: "3/5" for 3 out of 5 correct answers
+	userId: { type: DataTypes.INTEGER, allowNull: false }, // Зовнішній ключ, що посилається на користувача
+	courseId: { type: DataTypes.INTEGER, allowNull: false }, // Курс посилання на зовнішній ключ
+	result: { type: DataTypes.STRING }, // Приклад: «3/5» за 3 з 5 правильних відповідей
 });
 
 const UserCourse = sequelize.define("user_course", {
@@ -96,7 +96,7 @@ const PreRegistration = sequelize.define("pre_registration", {
 	group: { type: DataTypes.STRING, allowNull: true },
 });
 
-// Каждый курс имеет параграфы
+// Кожен курс має параграфи
 
 User.hasOne(UserCourse);
 UserCourse.belongsTo(User);
@@ -126,7 +126,7 @@ Question.hasOne(Answer);
 Answer.belongsTo(Question);
 
 Course.hasMany(FinalResult);
-FinalResult.belongsTo(Course);
+FinalResult.belongsTo(Course)
 
 Course.hasMany(UserAnswer);
 UserAnswer.belongsTo(Course);

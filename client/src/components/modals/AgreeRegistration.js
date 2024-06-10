@@ -63,7 +63,7 @@ const CrateThem = ({ show, onHide }) => {
 		updatedUsers[index][field] = value;
 		setPreRegistrations(updatedUsers);
 
-		// Update selectedUsers if the user is already selected
+		// Оновіть selectedUsers, якщо користувача вже вибрано
 		setSelectedUsers((prevSelected) =>
 			prevSelected.map((selectedUser) =>
 				selectedUser.id === updatedUsers[index].id
@@ -90,11 +90,11 @@ const CrateThem = ({ show, onHide }) => {
 				<Table striped bordered hover className="mt-4">
 					<thead>
 						<tr>
-							<th>Выбрать</th>
-							<th>Группа</th>
-							<th>Имя</th>
-							<th>Фамилия</th>
-							<th>Email</th>
+							<th>Вибрати</th>
+							<th>Група</th>
+							<th>Ім'я</th>
+							<th>Прізвище</th>
+							<th>Електронна пошта</th>
 							<th>Роль</th>
 						</tr>
 					</thead>
@@ -159,7 +159,7 @@ const CrateThem = ({ show, onHide }) => {
 						onHide();
 					}}
 				>
-					Удалить
+					видалити
 				</Button>
 				<Button
 					variant="outline-success"
@@ -168,7 +168,7 @@ const CrateThem = ({ show, onHide }) => {
 						onHide();
 					}}
 				>
-					Добавить
+					Додати
 				</Button>
 			</Modal.Footer>
 		</Modal>

@@ -40,7 +40,9 @@ class UserController {
 					const candidate = await User.findOne({ where: { email } });
 					if (candidate) {
 						return next(
-							ApiError.badRequest("Пользователь с таким email уже существует")
+							ApiError.badRequest(
+						`Користувач з таким ${email} вже існує`
+							)
 						);
 					}
 
@@ -53,21 +55,21 @@ class UserController {
 						group,
 					});
 
-					// Создание записи в UserCourse для нового пользователя
+					// Створення запису в UserCourse для нового користувача
 					await UserCourse.create({
 						userId: newUser.id,
 					});
-
-					return newUser;
 				})
 			);
 
-			// Удаляем всех пользователей из таблицы PreRegistration
+			// Видаляємо всіх користувачів із таблиці PreRegistration
 			await PreRegistration.destroy({
 				where: { email: users.map((user) => user.email) },
 			});
+
+			return res.status(200).json({ message: "Success" });
 		} catch (error) {
-			console.error("Error during registration:", error);
+			
 			next(error);
 		}
 	}
@@ -76,11 +78,11 @@ class UserController {
 		const { email, password } = req.body;
 		const user = await User.findOne({ where: { email } });
 		if (!user) {
-			return next(ApiError.internal("Пользователь не найден"));
+			return next(ApiError.internal("Користувач не знайдений"));
 		}
 		let comparePassword = bcrypt.compareSync(password, user.password);
 		if (!comparePassword) {
-			return next(ApiError.internal("Указан неверный пароль"));
+			return next(ApiError.internal("Вказано неправильний пароль"));
 		}
 		const token = generateJWT(user.id, user.email, user.role);
 		const dataUser = {
@@ -94,18 +96,24 @@ class UserController {
 	}
 
 	async check(req, res, next) {
-		const token = generateJWT(req.user.id, req.user.email, req.user.role);
-		const email = req.user.email;
-		const user = await User.findOne({ where: { email } });
-		const dataUser = {
-			email: user.email,
-			name: user.name,
-			surname: user.surname,
-			group: user.group,
-			role: user.role,
-			id:user.id
-		};
-		return res.json({ token, dataUser });
+		try {
+	
+				const token = generateJWT(req.user.id, req.user.email, req.user.role);
+				const email = req.user.email;
+				const user = await User.findOne({ where: { email } });
+				const dataUser = {
+					email: user.email,
+					name: user.name,
+					surname: user.surname,
+					group: user.group,
+					role: user.role,
+					id: user.id,
+				};
+				return res.json({ token, dataUser });
+			
+		} catch (error) {
+			next(ApiError.badRequest(error.message));
+		}
 	}
 
 	async getAllUsers(req, res, next) {
@@ -120,20 +128,22 @@ class UserController {
 						include: [
 							{
 								model: BasketUserCourse,
-								attributes: { exclude: ["createdAt", "updatedAt","userCourseId"] },
+								attributes: {
+									exclude: ["createdAt", "updatedAt", "userCourseId"],
+								},
 							},
-						], // Вложенный include для получения данных о курсах
+						], 
 					},
 				],
 			});
 
 			if (!users || users.length === 0) {
-				return res.status(404).json({ message: "Users not found" });
+				return res.status(404).json({ message: "Користувачів не знайдено" });
 			}
 
 			res.status(200).json(users);
 		} catch (error) {
-			next(error); // передача ошибки в обработчик ошибок Express
+			next(error); // передача помилки в обробник помилок Express
 		}
 	}
 }
